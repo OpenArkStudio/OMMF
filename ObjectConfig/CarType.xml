@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<ClassInfo BuffSize="100" ClassType="2" />
+	<CObject name="name" type="string" min="0" max="20" init=""/>
+	<CObject name="engine" type="string" min="0" max="20" init=""/>
+	<CObject name="Long" type="int" length="0" max="300" init="0"/>
+	<CObject name="Wide" type="int" length="0" max="200" init="0"/>
+	<CObject name="high" type="int" length="0" max="200" init="0"/>
+</config>
