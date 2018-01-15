@@ -10,6 +10,10 @@ public:
     ~CReadObject();
 
     bool WriteClass(int i, vec_ObjectClass objObjectClassList);
+
+private:
+    bool Create_Object_H(int i, vec_ObjectClass objObjectClassList);
+    bool Check_Object_exist(string strClassName, vec_ObjectClass objObjectClassList);
 };
 
 #endif

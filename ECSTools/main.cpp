@@ -109,7 +109,7 @@ bool Read_XML_File(vec_Xml_File_Name& obj_vec_Xml_File_Name, vec_ObjectClass& ob
 
         //解析类相关参数信息
         char* pData = NULL;
-        obj_ObjectClass.m_strClassName = obj_vec_Xml_File_Name[i];
+        obj_ObjectClass.m_strClassName = Get_File_From_Path(obj_vec_Xml_File_Name[i]);
         pData = obj_MainConfig.GetData("ClassInfo", "BuffSize");
 
         if (NULL != pData)
@@ -148,7 +148,7 @@ bool Read_XML_File(vec_Xml_File_Name& obj_vec_Xml_File_Name, vec_ObjectClass& ob
 
             if (pData != NULL)
             {
-                obj_Object_Info.m_Type = (string)pData;
+                obj_Object_Info.m_strType = (string)pData;
             }
             else
             {
@@ -221,6 +221,14 @@ int main()
     {
         printf("[Main]Read_XML_File is fail.\n");
         return 0;
+    }
+
+    //开始生成文件
+    CReadObject objReadObject;
+
+    for (int i = 0; i < (int)obj_vec_ObjectClass.size(); i++)
+    {
+        objReadObject.WriteClass(i, obj_vec_ObjectClass);
     }
 
     getchar();
