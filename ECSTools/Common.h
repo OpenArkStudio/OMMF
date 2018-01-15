@@ -18,6 +18,8 @@ using namespace std;
 #define OBJECTCONFIG_PATH  "../ObjectConfig"
 #define OBJECT_OUTPUT_PATH "../ECSObject"
 
+#define MAX_CODE_LINE_SIZE 500
+
 struct _Object_Info
 {
     string m_strName;            //当前变量名
@@ -41,6 +43,43 @@ struct _ObjectClass
 typedef vector<_ObjectClass> vec_ObjectClass;
 
 typedef vector<string> vec_Xml_File_Name;
+
+typedef vector<string> vec_Base_Type;
+
+static void Get_Base_Type(vec_Base_Type& obj_vec_Base_Type_List)
+{
+    obj_vec_Base_Type_List.clear();
+    obj_vec_Base_Type_List.push_back("int");
+    obj_vec_Base_Type_List.push_back("float");
+    obj_vec_Base_Type_List.push_back("long");
+    obj_vec_Base_Type_List.push_back("string");
+}
+
+static bool Check_Base_Type(string strType, vec_Base_Type& obj_vec_Base_Type_List)
+{
+    for (int i = 0; i < (int)obj_vec_Base_Type_List.size(); i++)
+    {
+        if (obj_vec_Base_Type_List[i] == strType)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+static string Get_Type_Name(string strType, vec_Base_Type& obj_vec_Base_Type_List)
+{
+    for (int i = 0; i < (int)obj_vec_Base_Type_List.size(); i++)
+    {
+        if (obj_vec_Base_Type_List[i] == strType)
+        {
+            return strType;
+        }
+    }
+
+    return "C" + strType;
+}
 
 //安全的字符串赋值
 static void sprintf_safe(char* szText, int nLen, const char* fmt ...)

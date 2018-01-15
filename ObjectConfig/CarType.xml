@@ -3,7 +3,7 @@
 	<ClassInfo BuffSize="100" ClassType="2" />
 	<CObject name="name" type="string" min="0" max="20" init=""/>
 	<CObject name="engine" type="string" min="0" max="20" init=""/>
-	<CObject name="Long" type="int" length="0" max="300" init="0"/>
-	<CObject name="Wide" type="int" length="0" max="200" init="0"/>
-	<CObject name="high" type="int" length="0" max="200" init="0"/>
+	<CObject name="CarLong" type="int" min="0" max="300" init="0"/>
+	<CObject name="CarWide" type="int" min="0" max="200" init="0"/>
+	<CObject name="CarHigh" type="int" min="0" max="200" init="0"/>
 </config>

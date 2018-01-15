@@ -3,7 +3,7 @@
 	<ClassInfo BuffSize="100" ClassType="1" />
 	<CObject name="Msisdn" type="string" min="0" max="20" init=""/>
 	<CObject name="Longitude" type="float" min="0.0" max="180.0" init="0.0"/>
-	<CObject name="Latitude" type="float" length="0.0" max="180.0" init="0.0"/>
-	<CObject name="Speed" type="int" length="0" max="200"  init="0.0"/>
-	<CObject name="Cartype" type="Cartype"/>
+	<CObject name="Latitude" type="float" min="0.0" max="180.0" init="0.0"/>
+	<CObject name="Speed" type="int" min="0" max="200"  init="0.0"/>
+	<CObject name="CarType" type="CarType"/>
 </config>

@@ -163,10 +163,10 @@ bool Read_XML_File(vec_Xml_File_Name& obj_vec_Xml_File_Name, vec_ObjectClass& ob
             }
             else
             {
-                break;
+                obj_Object_Info.m_strMin = "";
             }
 
-            pData = obj_MainConfig.GetData("CObject", "max", pNextTiXmlElementMin);
+            pData = obj_MainConfig.GetData("CObject", "max", pNextTiXmlElementMax);
 
             if (pData != NULL)
             {
@@ -174,10 +174,10 @@ bool Read_XML_File(vec_Xml_File_Name& obj_vec_Xml_File_Name, vec_ObjectClass& ob
             }
             else
             {
-                break;
+                obj_Object_Info.m_strMax = "";
             }
 
-            pData = obj_MainConfig.GetData("CObject", "init", pNextTiXmlElementMin);
+            pData = obj_MainConfig.GetData("CObject", "init", pNextTiXmlElementInit);
 
             if (pData != NULL)
             {
@@ -185,7 +185,7 @@ bool Read_XML_File(vec_Xml_File_Name& obj_vec_Xml_File_Name, vec_ObjectClass& ob
             }
             else
             {
-                break;
+                obj_Object_Info.m_strInit = "";
             }
 
             obj_ObjectClass.m_vec_Object_Info.push_back(obj_Object_Info);
