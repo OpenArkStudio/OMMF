@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <config>
 	<ClassInfo BuffSize="100" ClassType="1" />
-	<CObject name="Msisdn" type="string" min="0" max="20" init=""/>
-	<CObject name="Longitude" type="float" min="0.0" max="180.0" init="0.0"/>
-	<CObject name="Latitude" type="float" min="0.0" max="180.0" init="0.0"/>
-	<CObject name="Speed" type="int" min="0" max="200"  init="0.0"/>
-	<CObject name="CarType" type="CarType"/>
+	<CObject name="Msisdn" type="Phone" min="0" max="20" init="" />
+	<CObject name="Longitude" type="uint32" min="0.0" max="180" init="0" />
+	<CObject name="Latitude" type="uint32" min="0.0" max="180" init="0" />
+	<CObject name="Speed" type="uint16" min="0" max="200"  init="0" />
+	<CObject name="CarType" type="GUID"/>
 </config>

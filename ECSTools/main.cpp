@@ -40,8 +40,11 @@ bool Read_Xml_Folder(string folderPath, vec_Xml_File_Name& obj_vec_Xml_File_Name
         }
         else
         {
-            string filename = folderPath + "\\" + FileInfo.name;
-            obj_vec_Xml_File_Name.push_back(filename);
+            if (strcmp(FileInfo.name, "BaseType.xml") != 0)
+            {
+                string filename = folderPath + "\\" + FileInfo.name;
+                obj_vec_Xml_File_Name.push_back(filename);
+            }
         }
     }
     while (_findnext(Handle, &FileInfo) == 0);
@@ -77,14 +80,92 @@ bool Read_Xml_Folder(string folderPath, vec_Xml_File_Name& obj_vec_Xml_File_Name
         }
         else
         {
-            string filename = folderPath + "/" + entry->d_name;
-            obj_vec_Xml_File_Name.push_back(filename);
+            if (strcmp("BaseType.xml", entry->d_name) != 0)
+            {
+                string filename = folderPath + "/" + entry->d_name;
+                obj_vec_Xml_File_Name.push_back(filename);
+            }
         }
     }
 
     chdir("..");
     closedir(dp);
 #endif
+    return true;
+}
+
+//读取基本类型声明表
+bool Read_Base_Type_XML_File(vec_Base_Type_List& obj_vec_Base_Type_List)
+{
+    CXmlOpeation obj_MainConfig;
+
+    obj_vec_Base_Type_List.clear();
+
+    if (false == obj_MainConfig.Init(OBJECT_BASETYPE_PATH))
+    {
+        printf("[Read_Base_Type_XML_File]File Read Error = %s.\n", OBJECT_BASETYPE_PATH);
+        return false;
+    }
+
+    //解析类相关参数信息
+    char* pData = NULL;
+
+    TiXmlElement* pNextTiXmlElementName  = NULL;
+    TiXmlElement* pNextTiXmlElementType  = NULL;
+    TiXmlElement* pNextTiXmlElementClass = NULL;
+    TiXmlElement* pNextTiXmlElementSize  = NULL;
+
+    while (true)
+    {
+        _BaseType obj_BaseType;
+        pData = obj_MainConfig.GetData("CObject", "name", pNextTiXmlElementName);
+
+        if (pData != NULL)
+        {
+            obj_BaseType.m_strBaseTypeName = (string)pData;
+        }
+        else
+        {
+            break;
+        }
+
+        pData = obj_MainConfig.GetData("CObject", "type", pNextTiXmlElementType);
+
+        if (pData != NULL)
+        {
+            obj_BaseType.m_strTypeName = (string)pData;
+        }
+        else
+        {
+            break;
+        }
+
+        pData = obj_MainConfig.GetData("CObject", "class", pNextTiXmlElementClass);
+
+        if (pData != NULL)
+        {
+            obj_BaseType.m_strClassName = (string)pData;
+        }
+        else
+        {
+            break;
+        }
+
+        pData = obj_MainConfig.GetData("CObject", "size", pNextTiXmlElementSize);
+
+        if (pData != NULL)
+        {
+            obj_BaseType.m_nLen = atoi(pData);
+        }
+        else
+        {
+            break;
+        }
+
+
+        obj_vec_Base_Type_List.push_back(obj_BaseType);
+    }
+
     return true;
 }
 
@@ -204,9 +285,19 @@ int main()
     bool blRet = false;
     vec_Xml_File_Name obj_vec_Xml_File_Name;
     vec_ObjectClass  obj_vec_ObjectClass;
+    vec_Base_Type_List obj_vec_Base_Type_List;
+
+    //获得基础类型名
+    blRet = Read_Base_Type_XML_File(obj_vec_Base_Type_List);
+
+    if (false == blRet)
+    {
+        printf("[Main]Read_Base_Type_XML_File is fail.\n");
+        return 0;
+    }
 
     //获得所有的xml文件名
-    blRet = Read_Xml_Folder(OBJECTCONFIG_PATH, obj_vec_Xml_File_Name);
+    blRet = Read_Xml_Folder(OBJECT_CONFIG_PATH, obj_vec_Xml_File_Name);
 
     if (false == blRet)
     {
@@ -223,12 +314,15 @@ int main()
         return 0;
     }
 
+    //创建公共头文件
+    Create_Base_Type_H(obj_vec_Base_Type_List);
+
     //开始生成文件
     CReadObject objReadObject;
 
     for (int i = 0; i < (int)obj_vec_ObjectClass.size(); i++)
     {
-        objReadObject.WriteClass(i, obj_vec_ObjectClass);
+        objReadObject.WriteClass(i, obj_vec_ObjectClass, obj_vec_Base_Type_List);
     }
 
     getchar();
