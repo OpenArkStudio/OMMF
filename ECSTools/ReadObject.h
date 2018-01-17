@@ -14,7 +14,7 @@ public:
 private:
     bool Check_Type_In_Class(string strBaseTypeName, vec_Object_Info obj_vec_Object_Info);
     bool Create_Object_H(int nIndex, vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List);
-    bool Check_Object_exist(string strClassName, vec_ObjectClass objObjectClassList);
+    bool Create_Object_Cpp(int nIndex, vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List);
 };
 
 #endif

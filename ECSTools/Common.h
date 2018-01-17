@@ -81,6 +81,19 @@ static bool Check_Base_Type(string strType, vec_Base_Type_List& obj_vec_Base_Typ
     return false;
 }
 
+static int Get_Base_Type_Size(string strType, vec_Base_Type_List& obj_vec_Base_Type_List)
+{
+    for (int i = 0; i < (int)obj_vec_Base_Type_List.size(); i++)
+    {
+        if (obj_vec_Base_Type_List[i].m_strBaseTypeName == strType)
+        {
+            return obj_vec_Base_Type_List[i].m_nLen;
+        }
+    }
+
+    return 0;
+}
+
 //安全的字符串赋值
 static void sprintf_safe(char* szText, int nLen, const char* fmt ...)
 {
@@ -120,6 +133,13 @@ static bool Create_Base_Type_H(vec_Base_Type_List& obj_vec_Base_Type_List)
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#define _BASETYPE_H\n\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#include <string>\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#include <vector>\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "using namespace std;\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
     for (int i = 0; i < (int)obj_vec_Base_Type_List.size(); i++)
     {
         if (obj_vec_Base_Type_List[i].m_strClassName == "single")
@@ -140,6 +160,31 @@ static bool Create_Base_Type_H(vec_Base_Type_List& obj_vec_Base_Type_List)
             fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
         }
     }
+
+    //创建消息类型，用于各个类的参数调用
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\nstruct _Object_Info\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tstring m_strName;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tstring m_strType;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tstring m_strMin;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tstring m_strMax;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tstring m_strInit;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tint m_nSize;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tint m_nStartPos;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "};\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "typedef vector<_Object_Info> vec_Object_Info_List;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
     fclose(pFile);
     return true;
