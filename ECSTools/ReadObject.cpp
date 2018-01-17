@@ -227,6 +227,43 @@ bool CReadObject::Create_Object_Cpp(int nIndex, vec_ObjectClass objObjectClassLi
                     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
                     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t{\n");
                     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tmemcpy(&m_szBuffPacket[m_vec_Object_Info_List[%d].m_nStartPos)], (char* )&Value, m_vec_Object_Info_List[%d].m_nSize);\n", j, j);
+                    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn %d;\n", nSize);
+                    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n");
+                    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                }
+            }
+
+            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\treturn 0;\n");
+            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n");
+            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        }
+    }
+
+    //创建所有读BaseType方法
+    for (int i = 0; i < (int)obj_vec_Base_Type_List.size(); i++)
+    {
+        if (true == Check_Type_In_Class(obj_vec_Base_Type_List[i].m_strBaseTypeName, objObjectClassList[nIndex].m_vec_Object_Info))
+        {
+            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "int C%s::Get_Data(string strValueName, %s& Value);\n",
+                         objObjectClassList[nIndex].m_strClassName.c_str(),
+                         obj_vec_Base_Type_List[i].m_strBaseTypeName.c_str());
+            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
+            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+            for (int j = 0; j < (int)objObjectClassList[nIndex].m_vec_Object_Info.size(); j++)
+            {
+                if (objObjectClassList[nIndex].m_vec_Object_Info[j].m_strType == obj_vec_Base_Type_List[i].m_strBaseTypeName)
+                {
+                    int nSize = Get_Base_Type_Size(objObjectClassList[nIndex].m_vec_Object_Info[j].m_strType, obj_vec_Base_Type_List);
+                    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tif(strValueName == \"%s\")\n", objObjectClassList[nIndex].m_vec_Object_Info[j].m_strName.c_str());
+                    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t{\n");
+                    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
                     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tmemcpy((char* )&Value, &m_szBuffPacket[m_vec_Object_Info_List[%d].m_nStartPos)], m_vec_Object_Info_List[%d].m_nSize);\n", j, j);
                     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
                     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn %d;\n", nSize);
