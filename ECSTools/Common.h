@@ -145,7 +145,7 @@ static bool Create_Base_Class_H()
 
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#endif\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-
+    fclose(pFile);
     return true;
 }
 
