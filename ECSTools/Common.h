@@ -15,10 +15,11 @@
 
 using namespace std;
 
-#define OBJECT_CONFIG_PATH   "../ObjectConfig"
-#define OBJECT_OUTPUT_PATH   "../ECSObject"
-#define OBJECT_BASETYPE_PATH "../ObjectConfig/BaseType.xml"
-#define OBJECT_BASETYPE_FILE "BaseType.h"
+#define OBJECT_CONFIG_PATH    "../ObjectConfig"
+#define OBJECT_OUTPUT_PATH    "../ECSObject"
+#define OBJECT_BASETYPE_PATH  "../ObjectConfig/BaseType.xml"
+#define OBJECT_BASETYPE_FILE  "BaseType.h"
+#define OBJECT_BASECLASS_FILE "BaseObject.h"
 
 #define MAX_CODE_LINE_SIZE 500
 
@@ -111,6 +112,43 @@ static void sprintf_safe(char* szText, int nLen, const char* fmt ...)
     va_end(ap);
 };
 
+//创建Obect基类
+static bool Create_Base_Class_H()
+{
+    char szHFileName[200] = { '\0' };
+    char szCodeLine[MAX_CODE_LINE_SIZE] = { '\0' };
+
+    sprintf(szHFileName, "%s//%s", OBJECT_OUTPUT_PATH, OBJECT_BASECLASS_FILE);
+    FILE* pFile = fopen(szHFileName, "w");
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "//create BaseObject.h\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#ifndef _BASEOBJECT_H\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#define _BASEOBJECT_H\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "class IObject\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "public:\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tvirtual ~IObject() = 0;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tvirtual bool Get_Stream(char* pData, int& nLen) = 0;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tvirtual bool Set_Stream(char* pData, int& nLen) = 0;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "};\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#endif\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    return true;
+}
+
 //创建基本类型定义头文件
 static bool Create_Base_Type_H(vec_Base_Type_List& obj_vec_Base_Type_List)
 {
@@ -184,6 +222,8 @@ static bool Create_Base_Type_H(vec_Base_Type_List& obj_vec_Base_Type_List)
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "typedef vector<_Object_Info> vec_Object_Info_List;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#endif\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
     fclose(pFile);

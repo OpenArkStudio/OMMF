@@ -317,6 +317,9 @@ int main()
     //创建公共头文件
     Create_Base_Type_H(obj_vec_Base_Type_List);
 
+    //创建基类文件
+    Create_Base_Class_H();
+
     //开始生成文件
     CReadObject objReadObject;
 

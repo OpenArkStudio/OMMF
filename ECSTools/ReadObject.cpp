@@ -84,11 +84,13 @@ bool CReadObject::Create_Object_H(int nIndex, vec_ObjectClass objObjectClassList
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#include \"%s\"\n", OBJECT_BASETYPE_FILE);
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#include \"%s\"\n", OBJECT_BASECLASS_FILE);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "class C%s\n", objObjectClassList[nIndex].m_strClassName.c_str());
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "class C%s : public IObject\n", objObjectClassList[nIndex].m_strClassName.c_str());
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
@@ -99,7 +101,7 @@ bool CReadObject::Create_Object_H(int nIndex, vec_ObjectClass objObjectClassList
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t~C%s();\n", objObjectClassList[nIndex].m_strClassName.c_str());
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tvoid Init();\n");
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tvoid Load_Param();\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
     //创建所有的写BaseType方法
@@ -122,7 +124,17 @@ bool CReadObject::Create_Object_H(int nIndex, vec_ObjectClass objObjectClassList
         }
     }
 
+    //创建Get_Stream方法
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "bool Get_Stream(char* pData, int& nLen);\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    //创建Set_Stream方法
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "bool Get_Stream(char* pData, int& nLen);\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "private:\n", objObjectClassList[nIndex].m_strClassName.c_str());
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tint m_nBuffPacketSize;\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tchar m_szBuffPacket[%d];\n", objObjectClassList[nIndex].m_nBuffSize);
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
@@ -131,6 +143,8 @@ bool CReadObject::Create_Object_H(int nIndex, vec_ObjectClass objObjectClassList
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "};\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#endif\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     fclose(pFile);
 
     return true;
@@ -158,7 +172,7 @@ bool CReadObject::Create_Object_Cpp(int nIndex, vec_ObjectClass objObjectClassLi
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t Init();\n");
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t Load_Param();\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
@@ -171,8 +185,8 @@ bool CReadObject::Create_Object_Cpp(int nIndex, vec_ObjectClass objObjectClassLi
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
-    //初始化函数
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "C%s::Init()\n", objObjectClassList[nIndex].m_strClassName.c_str());
+    //初始化所有属性对象函数
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "C%s::Load_Param()\n", objObjectClassList[nIndex].m_strClassName.c_str());
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
@@ -203,6 +217,8 @@ bool CReadObject::Create_Object_Cpp(int nIndex, vec_ObjectClass objObjectClassLi
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     }
 
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tm_nBuffPacketSize = %d;\n", objObjectClassList[nIndex].m_nBuffSize);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
@@ -279,6 +295,50 @@ bool CReadObject::Create_Object_Cpp(int nIndex, vec_ObjectClass objObjectClassLi
             fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
         }
     }
+
+    //创建Get_Stream方法
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "bool C%s::Get_Stream(char* pData, int& nLen)\n", objObjectClassList[nIndex].m_strClassName.c_str());
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tif(nLen < 0 || nLen > m_nBuffPacketSize)\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t{\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn false;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tmemcpy(pData, m_szBuffPacket, m_nBuffPacketSize);\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tnLen = m_nBuffPacketSize;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\treturn true;\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    //创建Set_Stream方法
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "bool C%s::Get_Stream(char* pData, int& nLen)\n", objObjectClassList[nIndex].m_strClassName.c_str());
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tif(nLen < 0 || nLen > m_nBuffPacketSize)\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t{\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn false;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tmemcpy(m_szBuffPacket, pData, m_nBuffPacketSize);\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tnLen = m_nBuffPacketSize;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\treturn true;\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
     fclose(pFile);
 
