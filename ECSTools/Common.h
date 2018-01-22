@@ -39,11 +39,13 @@ struct _ObjectClass
     string m_strClassName;                //对象名
     int    m_nBuffSize;                   //对象最大缓冲大小
     int    m_nClassType;                  //对象类型ID
+    int    m_nClassID;                    //object类对象的唯一ID
 
     _ObjectClass()
     {
         m_nBuffSize  = 0;
         m_nClassType = 0;
+        m_nClassID   = 0;
     }
 
     vec_Object_Info m_vec_Object_Info;    //变量列表
@@ -134,7 +136,7 @@ static bool Create_Base_Class_H()
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "public:\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tvirtual ~IObject() = 0;\n");
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tvirtual ~IObject() {};\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tvirtual bool Get_Stream(char* pData, int& nLen) = 0;\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);

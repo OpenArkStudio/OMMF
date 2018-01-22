@@ -205,6 +205,18 @@ bool Read_XML_File(vec_Xml_File_Name& obj_vec_Xml_File_Name, vec_ObjectClass& ob
             obj_ObjectClass.m_nClassType = atoi(pData);
         }
 
+        pData = obj_MainConfig.GetData("ClassInfo", "ClassID");
+
+        if (NULL != pData)
+        {
+            obj_ObjectClass.m_nClassID = atoi(pData);
+        }
+        else
+        {
+            printf("[Read_XML_File](%s)Class ID no exist.\n", obj_vec_Xml_File_Name[i].c_str());
+            return false;
+        }
+
         TiXmlElement* pNextTiXmlElementName = NULL;
         TiXmlElement* pNextTiXmlElementType = NULL;
         TiXmlElement* pNextTiXmlElementMin  = NULL;

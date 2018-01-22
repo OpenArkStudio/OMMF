@@ -4,7 +4,7 @@
 	<CObject name="uint16" type="unsigned short" class="single" size="2"/>
 	<CObject name="uint32" type="unsigned int" class="single" size="4" />
 	<CObject name="uint64" type="unsigned long" class="single" size="8" />
-	<CObject name="GUID" type="char" class="array" size="16" />
-	<CObject name="Phone" type="char" class="array" size="16" />
+	<CObject name="GUID" type="char" class="array" size="32" />
+	<CObject name="Phone" type="char" class="array" size="12" />
 	<CObject name="CarName" type="char" class="array" size="16" />
 </config>
