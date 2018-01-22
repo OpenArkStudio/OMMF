@@ -171,6 +171,8 @@ static bool Create_Base_Type_H(vec_Base_Type_List& obj_vec_Base_Type_List)
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#define _BASETYPE_H\n\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#include <stdio.h>\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#include <string>\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#include <vector>\n\n");
@@ -184,16 +186,16 @@ static bool Create_Base_Type_H(vec_Base_Type_List& obj_vec_Base_Type_List)
         {
             //单个对象
             sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "typedef %s %s;\n",
-                         obj_vec_Base_Type_List[i].m_strBaseTypeName.c_str(),
-                         obj_vec_Base_Type_List[i].m_strTypeName.c_str());
+                         obj_vec_Base_Type_List[i].m_strTypeName.c_str(),
+                         obj_vec_Base_Type_List[i].m_strBaseTypeName.c_str());
             fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
         }
         else
         {
             //数组
             sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "typedef %s %s[%d];\n",
-                         obj_vec_Base_Type_List[i].m_strBaseTypeName.c_str(),
                          obj_vec_Base_Type_List[i].m_strTypeName.c_str(),
+                         obj_vec_Base_Type_List[i].m_strBaseTypeName.c_str(),
                          obj_vec_Base_Type_List[i].m_nLen);
             fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
         }
