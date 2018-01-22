@@ -95,6 +95,7 @@ public:
         }
 
         //如果都没有找到
+        printf("[Create]Object no can use object.\n");
         return NULL;
     }
 
@@ -103,6 +104,12 @@ public:
     {
         int nType = 0;
         int nPos  = 0;
+
+        if (NULL == pt)
+        {
+            printf("[Delete]pObjectUID is NULL.\n");
+            return;
+        }
 
         if (0 == Get_Object_UID_Info(pObjectUID, nLen, nType, nPos))
         {
