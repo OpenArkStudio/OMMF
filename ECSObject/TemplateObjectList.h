@@ -100,7 +100,7 @@ public:
     }
 
     //归还一个正在使用的对象
-    void Delete(char* pObjectUID, int nLen, T* pt)
+    bool Delete(char* pObjectUID, int nLen, T* pt)
     {
         int nType = 0;
         int nPos  = 0;
@@ -108,13 +108,18 @@ public:
         if (NULL == pt)
         {
             printf("[Delete]pObjectUID is NULL.\n");
-            return;
+            return false;
         }
 
         if (0 == Get_Object_UID_Info(pObjectUID, nLen, nType, nPos))
         {
             //回收对象
             m_objectList[nPos].m_nState = 1; //标记为未使用
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 

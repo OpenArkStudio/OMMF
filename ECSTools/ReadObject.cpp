@@ -444,11 +444,11 @@ bool CReadObject::Create_List_Manager_H(vec_ObjectClass objObjectClassList, vec_
 
     for (int i = 0; i < (int)objObjectClassList.size(); i++)
     {
-        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#inlcude \"%s.h\"\n", objObjectClassList[i].m_strClassName.c_str());
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#include \"%s.h\"\n", objObjectClassList[i].m_strClassName.c_str());
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     }
 
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\n");
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#include \"TemplateObjectList.h\"\n\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "class C%s\n", OBJECT_LIST_MANAGER_NAME);
@@ -465,7 +465,7 @@ bool CReadObject::Create_List_Manager_H(vec_ObjectClass objObjectClassList, vec_
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tIObject* Create(int nClassID, char* szUID, int& nUIDSize);\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tbool Delete(int nClassID, IObject* pObject);\n");
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tbool Delete(int nClassID, char* szUID, int& nUIDSize, IObject* pObject);\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "private:\n", OBJECT_LIST_MANAGER_NAME);
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
@@ -541,7 +541,7 @@ bool CReadObject::Create_List_Manager_Cpp(vec_ObjectClass objObjectClassList, ve
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
     //创建获取对象函数
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "IObject* C%s::Create(int nClassID, char* szUID, int& nUIDSize);\n", OBJECT_LIST_MANAGER_NAME);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "IObject* C%s::Create(int nClassID, char* szUID, int& nUIDSize)\n", OBJECT_LIST_MANAGER_NAME);
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
@@ -566,7 +566,7 @@ bool CReadObject::Create_List_Manager_Cpp(vec_ObjectClass objObjectClassList, ve
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
     //创建回收函数
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "bool C%s::Delete(int nClassID, IObject* pObject);\n",
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "bool C%s::Delete(int nClassID, char* szUID, int& nUIDSize, IObject* pObject)\n",
                  OBJECT_LIST_MANAGER_NAME);
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
@@ -579,7 +579,7 @@ bool CReadObject::Create_List_Manager_Cpp(vec_ObjectClass objObjectClassList, ve
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
         sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t{\n");
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn (IObject* )m_obj%sList.Delete(szUID, nUIDSize, (C%s* )pObject);\n",
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn m_obj%sList.Delete(szUID, nUIDSize, (C%s* )pObject);\n",
                      objObjectClassList[i].m_strClassName.c_str(),
                      objObjectClassList[i].m_strClassName.c_str());
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
@@ -587,9 +587,10 @@ bool CReadObject::Create_List_Manager_Cpp(vec_ObjectClass objObjectClassList, ve
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     }
 
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\treturn NULL;\n");
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\treturn false;\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     fclose(pFile);
     return true;
 }
