@@ -217,6 +217,18 @@ bool Read_XML_File(vec_Xml_File_Name& obj_vec_Xml_File_Name, vec_ObjectClass& ob
             return false;
         }
 
+        pData = obj_MainConfig.GetData("ClassInfo", "ListCount");
+
+        if (NULL != pData)
+        {
+            obj_ObjectClass.m_nObjectListCount = atoi(pData);
+        }
+        else
+        {
+            printf("[Read_XML_File](%s)ListCount no exist.\n", obj_vec_Xml_File_Name[i].c_str());
+            return false;
+        }
+
         TiXmlElement* pNextTiXmlElementName = NULL;
         TiXmlElement* pNextTiXmlElementType = NULL;
         TiXmlElement* pNextTiXmlElementMin  = NULL;
@@ -339,6 +351,8 @@ int main()
     {
         objReadObject.WriteClass(i, obj_vec_ObjectClass, obj_vec_Base_Type_List);
     }
+
+    objReadObject.WriteListManager(obj_vec_ObjectClass, obj_vec_Base_Type_List);
 
     getchar();
     return 0;

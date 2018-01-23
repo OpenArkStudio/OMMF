@@ -28,6 +28,23 @@ bool CReadObject::WriteClass(int i, vec_ObjectClass objObjectClassList, vec_Base
     return true;
 }
 
+bool CReadObject::WriteListManager(vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List)
+{
+    if (false == Create_List_Manager_H(objObjectClassList, obj_vec_Base_Type_List))
+    {
+        printf("[CReadObject::WriteListManager]Create (%s) H file error.\n", OBJECT_LIST_MANAGER_NAME);
+        return false;
+    }
+
+    if (false == Create_List_Manager_Cpp(objObjectClassList, obj_vec_Base_Type_List))
+    {
+        printf("[CReadObject::WriteListManager]Create (%s) Cpp file error.\n", OBJECT_LIST_MANAGER_NAME);
+        return false;
+    }
+
+    return true;
+}
+
 bool CReadObject::Check_Type_In_Class(string strBaseTypeName, vec_Object_Info obj_vec_Object_Info)
 {
     for (int i = 0; i < (int)obj_vec_Object_Info.size(); i++)
@@ -399,6 +416,181 @@ bool CReadObject::Create_Object_Cpp(int nIndex, vec_ObjectClass objObjectClassLi
 
     fclose(pFile);
 
+    return true;
+}
+
+bool CReadObject::Create_List_Manager_H(vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List)
+{
+    //创建对象管理类
+    char szHFileName[200] = { '\0' };
+    char szCodeLine[MAX_CODE_LINE_SIZE] = { '\0' };
+
+    sprintf(szHFileName, "%s//%s.h", OBJECT_OUTPUT_PATH, OBJECT_LIST_MANAGER_NAME);
+    FILE* pFile = fopen(szHFileName, "w");
+
+    if (NULL == pFile)
+    {
+        printf("[CReadObject::Create_List_Manager_H]fopen(%s) error.\n", szHFileName);
+        return false;
+    }
+
+    //添加所有需要的对象头文件
+    char szDefine[200] = { '\0' };
+    To_Upper_String(OBJECT_LIST_MANAGER_NAME, szDefine);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#ifndef _%s_H\n", szDefine);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#define _%s_H\n\n", szDefine);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    for (int i = 0; i < (int)objObjectClassList.size(); i++)
+    {
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#inlcude \"%s.h\"\n", objObjectClassList[i].m_strClassName.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "class C%s\n", OBJECT_LIST_MANAGER_NAME);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "public:\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tC%s();\n", OBJECT_LIST_MANAGER_NAME);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t~C%s();\n", OBJECT_LIST_MANAGER_NAME);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tvoid Init();\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tIObject* Create(int nClassID, char* szUID, int& nUIDSize);\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tbool Delete(int nClassID, IObject* pObject);\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "private:\n", OBJECT_LIST_MANAGER_NAME);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    for (int i = 0; i < (int)objObjectClassList.size(); i++)
+    {
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tCOjectList<C%s> m_obj%sList;\n",
+                     objObjectClassList[i].m_strClassName.c_str(),
+                     objObjectClassList[i].m_strClassName.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "};\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#endif\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    fclose(pFile);
+
+    return true;
+}
+
+bool CReadObject::Create_List_Manager_Cpp(vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List)
+{
+    //创建对象管理类
+    char szHFileName[200] = { '\0' };
+    char szCodeLine[MAX_CODE_LINE_SIZE] = { '\0' };
+
+    sprintf(szHFileName, "%s//%s.cpp", OBJECT_OUTPUT_PATH, OBJECT_LIST_MANAGER_NAME);
+    FILE* pFile = fopen(szHFileName, "w");
+
+    if (NULL == pFile)
+    {
+        printf("[CReadObject::Create_List_Manager_Cpp]fopen(%s) error.\n", szHFileName);
+        return false;
+    }
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#include \"%s.h\"\n\n", OBJECT_LIST_MANAGER_NAME);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    //创建构造函数
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "C%s::C%s()\n", OBJECT_LIST_MANAGER_NAME, OBJECT_LIST_MANAGER_NAME);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    //创建析构函数
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "C%s::~C%s()\n", OBJECT_LIST_MANAGER_NAME, OBJECT_LIST_MANAGER_NAME);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    //创建初始化函数
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "void C%s::Init()\n", OBJECT_LIST_MANAGER_NAME);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    for (int i = 0; i < (int)objObjectClassList.size(); i++)
+    {
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tm_obj%sList.Init(%d, %d);\n",
+                     objObjectClassList[i].m_strClassName.c_str(),
+                     objObjectClassList[i].m_nClassID,
+                     objObjectClassList[i].m_nObjectListCount);
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    //创建获取对象函数
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "IObject* C%s::Create(int nClassID, char* szUID, int& nUIDSize);\n", OBJECT_LIST_MANAGER_NAME);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    for (int i = 0; i < (int)objObjectClassList.size(); i++)
+    {
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tif(nClassID == %d)\n",
+                     objObjectClassList[i].m_nClassID);
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t{\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn (IObject* )m_obj%sList.Create(szUID, nUIDSize);\n",
+                     objObjectClassList[i].m_strClassName.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\treturn NULL;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    //创建回收函数
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "bool C%s::Delete(int nClassID, IObject* pObject);\n",
+                 OBJECT_LIST_MANAGER_NAME);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    for (int i = 0; i < (int)objObjectClassList.size(); i++)
+    {
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tif(nClassID == %d)\n",
+                     objObjectClassList[i].m_nClassID);
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t{\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn (IObject* )m_obj%sList.Delete(szUID, nUIDSize, (C%s* )pObject);\n",
+                     objObjectClassList[i].m_strClassName.c_str(),
+                     objObjectClassList[i].m_strClassName.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\treturn NULL;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
+    fclose(pFile);
     return true;
 }
 

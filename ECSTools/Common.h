@@ -15,11 +15,12 @@
 
 using namespace std;
 
-#define OBJECT_CONFIG_PATH    "../ObjectConfig"
-#define OBJECT_OUTPUT_PATH    "../ECSObject"
-#define OBJECT_BASETYPE_PATH  "../ObjectConfig/BaseType.xml"
-#define OBJECT_BASETYPE_FILE  "BaseType.h"
-#define OBJECT_BASECLASS_FILE "BaseObject.h"
+#define OBJECT_CONFIG_PATH       "../ObjectConfig"
+#define OBJECT_OUTPUT_PATH       "../ECSObject"
+#define OBJECT_BASETYPE_PATH     "../ObjectConfig/BaseType.xml"
+#define OBJECT_BASETYPE_FILE     "BaseType.h"
+#define OBJECT_BASECLASS_FILE    "BaseObject.h"
+#define OBJECT_LIST_MANAGER_NAME "ObjectManager"
 
 #define MAX_CODE_LINE_SIZE 500
 
@@ -40,12 +41,14 @@ struct _ObjectClass
     int    m_nBuffSize;                   //对象最大缓冲大小
     int    m_nClassType;                  //对象类型ID
     int    m_nClassID;                    //object类对象的唯一ID
+    int    m_nObjectListCount;            //当前对象池列表最大数量
 
     _ObjectClass()
     {
-        m_nBuffSize  = 0;
-        m_nClassType = 0;
-        m_nClassID   = 0;
+        m_nBuffSize        = 0;
+        m_nClassType       = 0;
+        m_nClassID         = 0;
+        m_nObjectListCount = 0;
     }
 
     vec_Object_Info m_vec_Object_Info;    //变量列表
