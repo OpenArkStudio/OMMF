@@ -84,6 +84,7 @@ static bool Check_Base_Type(string strType, vec_Base_Type_List& obj_vec_Base_Typ
     return false;
 }
 
+//得到当前数据类型长度
 static int Get_Base_Type_Size(string strType, vec_Base_Type_List& obj_vec_Base_Type_List)
 {
     for (int i = 0; i < (int)obj_vec_Base_Type_List.size(); i++)
@@ -95,6 +96,20 @@ static int Get_Base_Type_Size(string strType, vec_Base_Type_List& obj_vec_Base_T
     }
 
     return 0;
+}
+
+//得到当前数据类型(单个数据，数组)
+static string Get_Base_Type_Class(string strType, vec_Base_Type_List& obj_vec_Base_Type_List)
+{
+    for (int i = 0; i < (int)obj_vec_Base_Type_List.size(); i++)
+    {
+        if (obj_vec_Base_Type_List[i].m_strBaseTypeName == strType)
+        {
+            return obj_vec_Base_Type_List[i].m_strClassName;
+        }
+    }
+
+    return "";
 }
 
 //安全的字符串赋值
