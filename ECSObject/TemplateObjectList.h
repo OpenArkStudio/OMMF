@@ -7,6 +7,60 @@
 
 #define GUID_SIZE 24
 
+//创建一个ObjectID
+static int Create_Object_UID(char* pObjectUID, int& nLen, int nType, int nPos)
+{
+    if (nLen < GUID_SIZE)
+    {
+        //给的GUID字符串内存不够
+        printf("[Create_Object_UID]no enough GUID_SIZE(%d).\n", nLen);
+        return -1;
+    }
+
+    //创建规则，时间+ClassID+数组下标
+    time_t ttCurrentTime;
+    time(&ttCurrentTime);
+    struct tm tmTime;
+#ifdef WIN32
+    localtime_s(&tmTime, &ttCurrentTime);
+#else
+    localtime_r(&tmTime, &ttCurrentTime);
+#endif
+    char szTimeNow[50] = { '\0' };
+    sprintf(szTimeNow, "%04d%02d%02d%02d%02d%02d",
+            tmTime.tm_year + 1900,
+            tmTime.tm_mon + 1,
+            tmTime.tm_mday,
+            tmTime.tm_hour,
+            tmTime.tm_min,
+            tmTime.tm_sec);
+
+    sprintf(pObjectUID, "%s%04d%06d", szTimeNow, nType, nPos);
+    nLen = GUID_SIZE;
+    return 0;
+}
+
+//从一个ObjectUID中获得当前类型ID
+static int Get_Object_UID_Info(char* pObjectUID, int nLen, int& nType, int& nPos)
+{
+    if (GUID_SIZE != nLen)
+    {
+        printf("[Get_Object_UID_Info]error GUID_SIZE(%d).\n", nLen);
+        return -1;
+    }
+
+    char szType[10] = { '\0' };
+    char szPos[10] = { '\0' };
+
+    memcpy(szType, &pObjectUID[14], 4);
+    memcpy(szPos, &pObjectUID[18], 6);
+
+    nType = atoi(szType);
+    nPos = atoi(szPos);
+
+    return 0;
+}
+
 struct _Object_Data_Info
 {
     IObject*  m_pObject;       //指针对象
@@ -19,8 +73,8 @@ struct _Object_Data_Info
 
     void Init()
     {
-        m_pObject = NULL;
-        m_nState  = 0;
+        m_pObject              = NULL;
+        m_nState               = 0;
     }
 };
 
@@ -33,6 +87,9 @@ public:
         m_nType      = 0;
         m_nCount     = 0;
         m_objectList = NULL;
+
+        Create_Object_UID_Fn = Create_Object_UID;
+        Get_Object_UID_Info_Fn = Get_Object_UID_Info;
     };
 
     ~COjectList()
@@ -77,7 +134,7 @@ public:
             {
                 m_objectList[i].m_nState = 2; //标记位正在使用
                 m_nCurrIndex = i;
-                Create_Object_UID(pObjectUID, nLen, i);
+                Create_Object_UID_Fn(pObjectUID, nLen, m_nType, i);
                 return (T*)m_objectList[i].m_pObject;
             }
         }
@@ -89,7 +146,6 @@ public:
             {
                 m_objectList[i].m_nState = 2; //标记位正在使用
                 m_nCurrIndex = i;
-                Create_Object_UID(pObjectUID, nLen, i);
                 return (T*)m_objectList[i].m_pObject;
             }
         }
@@ -111,8 +167,14 @@ public:
             return false;
         }
 
-        if (0 == Get_Object_UID_Info(pObjectUID, nLen, nType, nPos))
+        if (0 == Get_Object_UID_Info_Fn(pObjectUID, nLen, nType, nPos))
         {
+            if (nType != m_nType || nPos < 0 || nPos >= m_nCount)
+            {
+                printf("[Delete]error nType=%d, nPos=%d.\n", nType, nPos);
+                return false;
+            }
+
             //回收对象
             m_objectList[nPos].m_nState = 1; //标记为未使用
             return true;
@@ -123,6 +185,35 @@ public:
         }
     }
 
+    //找到一个指定的对象
+    T* Get_Object(char* pObjectUID, int& nLen)
+    {
+        int nType = 0;
+        int nPos = 0;
+
+        if (0 == Get_Object_UID_Info_Fn(pObjectUID, nLen, nType, nPos))
+        {
+            if (nType != m_nType || nPos < 0 || nPos >= m_nCount)
+            {
+                printf("[Get_Object]error nType=%d, nPos=%d.\n", nType, nPos);
+                return NULL;
+            }
+
+            if (2 == m_objectList[nPos].m_nState)
+            {
+                return (T*)m_objectList[nPos].m_pObject;
+            }
+            else
+            {
+                return NULL;
+            }
+        }
+        else
+        {
+            return NULL;
+        }
+    }
+
     //得到当前的缓冲池中的Count
     int Get_Count()
     {
@@ -130,67 +221,9 @@ public:
     }
 
 private:
-    //创建一个ObjectID
-    int Create_Object_UID(char* pObjectUID, int& nLen, int nPos)
-    {
-        if (nLen < GUID_SIZE)
-        {
-            //给的GUID字符串内存不够
-            printf("[Create_Object_UID]no enough GUID_SIZE(%d).\n", nLen);
-            return -1;
-        }
+    int (*Create_Object_UID_Fn)(char* pObjectUID, int& nLen, int nType, int nPos);               //创建对象UID的消息函数指针
+    int (*Get_Object_UID_Info_Fn)(char* pObjectUID, int nLen, int& nType, int& nPos);       //获得指定对象UID分类函数指针
 
-        //创建规则，时间+ClassID+数组下标
-        time_t ttCurrentTime;
-        time(&ttCurrentTime);
-        struct tm tmTime;
-#ifdef WIN32
-        localtime_s(&tmTime, &ttCurrentTime);
-#else
-        localtime_r(&tmTime, &ttCurrentTime);
-#endif
-        char szTimeNow[50] = { '\0' };
-        sprintf(szTimeNow, "%04d%02d%02d%02d%02d%02d",
-                tmTime.tm_year + 1900,
-                tmTime.tm_mon + 1,
-                tmTime.tm_mday,
-                tmTime.tm_hour,
-                tmTime.tm_min,
-                tmTime.tm_sec);
-
-        sprintf(pObjectUID, "%s%04d%06d", szTimeNow, m_nType, nPos);
-        nLen = GUID_SIZE;
-        return 0;
-    }
-
-    //从一个ObjectUID中获得当前类型ID
-    int Get_Object_UID_Info(char* pObjectUID, int nLen, int& nType, int& nPos)
-    {
-        if (GUID_SIZE != nLen)
-        {
-            printf("[Get_Object_UID_Info]error GUID_SIZE(%d).\n", nLen);
-            return -1;
-        }
-
-        char szType[10] = { '\0' };
-        char szPos[10]  = { '\0' };
-
-        memcpy(szType, &pObjectUID[14], 4);
-        memcpy(szPos, &pObjectUID[18], 6);
-
-        nType = atoi(szType);
-        nPos  = atoi(szPos);
-
-        if (nType != m_nType || nPos < 0 || nPos >= m_nCount)
-        {
-            printf("[Get_Object_UID_Info]error nType=%d, nPos=%d.\n", nType, nPos);
-            return -1;
-        }
-
-        return 0;
-    }
-
-private:
     int                m_nType;           //当前的类对象类型
     int                m_nCount;          //当前缓冲数组对象的个数
     int                m_nUsedCount;      //当前正在使用对象的个数
