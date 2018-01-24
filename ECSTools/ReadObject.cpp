@@ -607,25 +607,23 @@ bool CReadObject::Create_List_Manager_Cpp(vec_ObjectClass objObjectClassList, ve
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t{\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\r return NULL;\n");
-    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n");
-    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
     for (int i = 0; i < (int)objObjectClassList.size(); i++)
     {
-        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tif(nClassID == %d)\n",
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tif(nClassID == %d)\n",
                      objObjectClassList[i].m_nClassID);
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t{\n");
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\t{\n");
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn (IObject* )m_obj%sList.Get_Object(szUID, nUIDSize);\n",
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\t\treturn (IObject* )m_obj%sList.Get_Object(szUID, nUIDSize);\n",
                      objObjectClassList[i].m_strClassName.c_str());
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n");
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\t}\n");
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     }
 
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\treturn NULL;\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
