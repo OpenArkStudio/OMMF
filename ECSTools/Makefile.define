@@ -1,7 +1,7 @@
 CC = g++
 AR = ar
 CFLAGS = -g -O2 -D__LINUX__
-INCLUDES = -I./ -I../ 
+INCLUDES = -I./ -I../ -I./TinyXML
 LIBS = -L/usr/lib64 -L/usr/local/lib64 -L/usr/local/lib -ldl
 
 # Here are some rules for converting .cpp -> .o
