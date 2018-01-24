@@ -1,0 +1,18 @@
+sudo: required
+dist: trusty
+group: deprecated-2017Q4
+language: cpp
+os:
+  - linux
+compiler:
+  - gcc
+branches:
+  only:
+  - master
+env:
+  global:
+    - CURPATH=$(pwd)
+    - COMPILER=g++-7
+
+script:
+  - make
