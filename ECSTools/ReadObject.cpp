@@ -754,7 +754,7 @@ bool CReadObject::Create_Test_Manager_Cpp(vec_ObjectClass objObjectClassList, ve
                              nSize);
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
                 sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tsprintf(obj%s, \"%s\");\n",
-                             objObjectClassList[i].m_vec_Object_Info[j].m_strType.c_str(),
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strName.c_str(),
                              objObjectClassList[i].m_vec_Object_Info[j].m_strInit.c_str());
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
                 sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tp%s->Set_Data(\"%s\", obj%s);\n",
@@ -814,7 +814,7 @@ bool CReadObject::Create_Test_Manager_Cpp(vec_ObjectClass objObjectClassList, ve
 
     for (int i = 0; i < (int)objObjectClassList.size(); i++)
     {
-        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tTest_%s(CObjectManager objObjectManager)\n", objObjectClassList[i].m_strClassName.c_str());
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tTest_%s(objObjectManager);\n", objObjectClassList[i].m_strClassName.c_str());
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     }
 
