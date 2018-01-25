@@ -11,6 +11,7 @@ public:
 
     bool WriteClass(int i, vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List);
     bool WriteListManager(vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List);
+    bool WriteTestManager(vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List);
 
 private:
     bool Check_Type_In_Class(string strBaseTypeName, vec_Object_Info obj_vec_Object_Info);
@@ -19,6 +20,10 @@ private:
 
     bool Create_List_Manager_H(vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List);
     bool Create_List_Manager_Cpp(vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List);
+
+    bool Create_Test_Manager_Cpp(vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List);
+    bool Create_Test_Make(vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List);
+    bool Create_Test_Make_Define(vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List);
 };
 
 #endif

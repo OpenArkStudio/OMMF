@@ -45,6 +45,29 @@ bool CReadObject::WriteListManager(vec_ObjectClass objObjectClassList, vec_Base_
     return true;
 }
 
+bool CReadObject::WriteTestManager(vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List)
+{
+    if (false == Create_Test_Manager_Cpp(objObjectClassList, obj_vec_Base_Type_List))
+    {
+        printf("[CReadObject::WriteTestManager]Create (%s) Cpp file error.\n", OBJECT_TEST_FILENAME);
+        return false;
+    }
+
+    if (false == Create_Test_Make(objObjectClassList, obj_vec_Base_Type_List))
+    {
+        printf("[CReadObject::WriteTestManager]Create (%s) Cpp file error.\n", OBJECT_TEST_FILENAME);
+        return false;
+    }
+
+    if (false == Create_Test_Make_Define(objObjectClassList, obj_vec_Base_Type_List))
+    {
+        printf("[CReadObject::WriteTestManager]Create (%s) Cpp file error.\n", OBJECT_TEST_FILENAME);
+        return false;
+    }
+
+    return true;
+}
+
 bool CReadObject::Check_Type_In_Class(string strBaseTypeName, vec_Object_Info obj_vec_Object_Info)
 {
     for (int i = 0; i < (int)obj_vec_Object_Info.size(); i++)
@@ -629,6 +652,275 @@ bool CReadObject::Create_List_Manager_Cpp(vec_ObjectClass objObjectClassList, ve
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
+    fclose(pFile);
+    return true;
+}
+
+bool CReadObject::Create_Test_Manager_Cpp(vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List)
+{
+    //创建对象管理类
+    char szHFileName[200] = { '\0' };
+    char szCodeLine[MAX_CODE_LINE_SIZE] = { '\0' };
+
+    sprintf(szHFileName, "%s//%s.cpp", OBJECT_TEST_PATH, OBJECT_TEST_FILENAME);
+    FILE* pFile = fopen(szHFileName, "w");
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#include \"ObjectManager.h\"\n\n", OBJECT_LIST_MANAGER_NAME);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    //添加测试函数
+    for (int i = 0; i < (int)objObjectClassList.size(); i++)
+    {
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "void Test_%s(CObjectManager& objObjectManager)\n", objObjectClassList[i].m_strClassName.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tchar szUID[50] = {'\\0'};\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tint nUIDSize   = 50;\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tC%s* p%s = (C%s* )objObjectManager.CreateObject(%d, szUID, nUIDSize);\n",
+                     objObjectClassList[i].m_strClassName.c_str(),
+                     objObjectClassList[i].m_strClassName.c_str(),
+                     objObjectClassList[i].m_strClassName.c_str(),
+                     objObjectClassList[i].m_nClassID);
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tif(NULL == p%s)\n",
+                     objObjectClassList[i].m_strClassName.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t{\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tprintf(\"%s Create fail.\\n\");\n", objObjectClassList[i].m_strClassName.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn;\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tp%s->Init();\n", objObjectClassList[i].m_strClassName.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+        //添加属性添加测试
+        for (int j = 0; j < (int)objObjectClassList[i].m_vec_Object_Info.size(); j++)
+        {
+            if (Get_Base_Type_Class(objObjectClassList[i].m_vec_Object_Info[j].m_strType, obj_vec_Base_Type_List) == "single")
+            {
+                //单个对象
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t%s obj%s = %s;\n",
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strType.c_str(),
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strName.c_str(),
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strInit.c_str());
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t%s objResult%s;\n",
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strType.c_str(),
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strName.c_str());
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tp%s->Set_Data(\"%s\", obj%s);\n",
+                             objObjectClassList[i].m_strClassName.c_str(),
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strName.c_str(),
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strName.c_str());
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tp%s->Get_Data(\"%s\", objResult%s);\n",
+                             objObjectClassList[i].m_strClassName.c_str(),
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strName.c_str(),
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strName.c_str());
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tif(objResult%s != obj%s)\n",
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strName.c_str(),
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strName.c_str());
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t{\n");
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tprintf(\"%s Set GetData is Not equal.\\n\");\n",
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strName.c_str());
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn;\n");
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n");
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+            }
+            else
+            {
+                //数组对象
+                int nSize = Get_Base_Type_Size(objObjectClassList[i].m_vec_Object_Info[j].m_strType.c_str(), obj_vec_Base_Type_List);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t%s obj%s;\n",
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strType.c_str(),
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strName.c_str(),
+                             nSize);
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t%s objResult%s;\n",
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strType.c_str(),
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strName.c_str(),
+                             nSize);
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tsprintf(obj%s, \"%s\");\n",
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strType.c_str(),
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strInit.c_str());
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tp%s->Set_Data(\"%s\", obj%s);\n",
+                             objObjectClassList[i].m_strClassName.c_str(),
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strName.c_str(),
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strName.c_str());
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tp%s->Get_Data(\"%s\", objResult%s);\n",
+                             objObjectClassList[i].m_strClassName.c_str(),
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strName.c_str(),
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strName.c_str());
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tif(strcmp(objResult%s, obj%s) != 0)\n",
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strName.c_str(),
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strName.c_str());
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t{\n");
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tprintf(\"%s Set GetData is Not equal.\\n\");\n",
+                             objObjectClassList[i].m_vec_Object_Info[j].m_strName.c_str());
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn;\n");
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n");
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+            }
+        }
+
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tif (true != objObjectManager.DeleteObject(%d, szUID, nUIDSize, p%s))\n",
+                     objObjectClassList[i].m_nClassID,
+                     objObjectClassList[i].m_strClassName.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t{\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tprintf(\"[main]Delete szUID = %%s fail.\\n\", szUID);\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+
+    //生成main函数
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "int main()\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tCObjectManager objObjectManager;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tobjObjectManager.Init();\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    for (int i = 0; i < (int)objObjectClassList.size(); i++)
+    {
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tTest_%s(CObjectManager objObjectManager)\n", objObjectClassList[i].m_strClassName.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\treturn 0;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    fclose(pFile);
+    return true;
+}
+
+bool CReadObject::Create_Test_Make(vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List)
+{
+    //创建Makfile文件
+    char szHFileName[200] = { '\0' };
+    char szCodeLine[MAX_CODE_LINE_SIZE] = { '\0' };
+
+    sprintf(szHFileName, "%s//Makefile", OBJECT_TEST_PATH);
+    FILE* pFile = fopen(szHFileName, "w");
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "include Makefile.define\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "default:all\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "PATS1 = main.o TestManager.o ../ECSObject/ObjectManager.o");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    for (int i = 0; i < (int)objObjectClassList.size(); i++)
+    {
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, " ../ECSObject/%s.o",
+                     objObjectClassList[i].m_strClassName.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "LIB_BASE_OBJS1 = main.o TestManager.o ObjectManager.o");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    for (int i = 0; i < (int)objObjectClassList.size(); i++)
+    {
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, " %s.o",
+                     objObjectClassList[i].m_strClassName.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "LIB_BASE1 = ESCTest\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "all:$(LIB_BASE1) Makefile\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "$(LIB_BASE1):$(PATS1)\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t$(CC) -rdynamic -o $(LIB_BASE1) $(LIB_BASE_OBJS1) $(LIBS)\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "clean:\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\trm -rf *.o  $(LIB_BASE1) $(LIB_BASE_OBJS1)\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "cl:\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\trm -rf *.o\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    fclose(pFile);
+
+    return true;
+}
+
+bool CReadObject::Create_Test_Make_Define(vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List)
+{
+    //创建Makfile.define文件
+    char szHFileName[200] = { '\0' };
+    char szCodeLine[MAX_CODE_LINE_SIZE] = { '\0' };
+
+    sprintf(szHFileName, "%s//Makefile.define", OBJECT_TEST_PATH);
+    FILE* pFile = fopen(szHFileName, "w");
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "CC = g++\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "AR = ar\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "CFLAGS = -g -O2 -D__LINUX__\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "INCLUDES = -I./ -I../\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "LIBS = -L/usr/lib64 -L/usr/local/lib64 -L/usr/local/lib -ldl\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, ".SUFFIXES: .cpp .o\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, ".cpp.o:\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t@$(CC) -fPIC $(CFLAGS) ${INCLUDES} -c $*.cpp\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t@echo '----- '$*.cpp' is compiled ok!'\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, ".SUFFIXES: .c .o\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, ".c.o:\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t@$(CC) -fPIC $(CFLAGS)  ${INCLUDES} -c $*.c\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t@echo '----- '$*.c' is compiled ok!'\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     fclose(pFile);
     return true;
 }

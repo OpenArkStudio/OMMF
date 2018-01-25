@@ -353,6 +353,7 @@ int main()
     }
 
     objReadObject.WriteListManager(obj_vec_ObjectClass, obj_vec_Base_Type_List);
+    objReadObject.WriteTestManager(obj_vec_ObjectClass, obj_vec_Base_Type_List);
 
     getchar();
     return 0;

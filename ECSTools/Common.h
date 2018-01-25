@@ -21,6 +21,8 @@ using namespace std;
 #define OBJECT_BASETYPE_FILE     "BaseType.h"
 #define OBJECT_BASECLASS_FILE    "BaseObject.h"
 #define OBJECT_LIST_MANAGER_NAME "ObjectManager"
+#define OBJECT_TEST_PATH         "../Test"
+#define OBJECT_TEST_FILENAME     "TestManager"
 
 #define MAX_CODE_LINE_SIZE 500
 
