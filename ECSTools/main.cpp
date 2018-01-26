@@ -12,6 +12,71 @@
 //生成工具，将指定的XML拆解成指定的Class对象，并提供Get Set方法。
 //add by freeeyes
 
+//设置当前路径
+//设置当前代码路径
+bool SetAppPath()
+{
+#ifndef WIN32	
+    int nSize = (int)pathconf(".",_PC_PATH_MAX);
+
+    if (nSize <= 0)
+    {
+        printf("[SetAppPath]pathconf is error(%d).\n", nSize);
+        return false;
+    }
+
+    char* pFilePath = new char[nSize];
+
+    if(NULL != pFilePath)
+    {
+        char szPath[300] = { '\0' };
+        memset(pFilePath, 0, nSize);
+        sprintf(pFilePath,"/proc/%d/exe",getpid());
+
+        //从符号链接中获得当前文件全路径和文件名
+        ssize_t stPathSize = readlink(pFilePath, szPath, 300 - 1);
+
+        if (stPathSize <= 0)
+        {
+            printf("[SetAppPath]no find work Path.\n", szPath);
+            delete[] pFilePath;
+            return false;
+        }
+        else
+        {
+            delete[] pFilePath;
+        }
+
+        while(szPath[stPathSize - 1]!='/')
+        {
+            stPathSize--;
+        }
+
+        szPath[stPathSize > 0 ? (stPathSize-1) : 0]= '\0';
+
+        int nRet = chdir(szPath);
+
+        if (-1 == nRet)
+        {
+            printf("[SetAppPath]Set work Path (%s) fail.\n", szPath);
+        }
+        else
+        {
+            printf("[SetAppPath]Set work Path (%s) OK.\n", szPath);
+        }
+
+        return true;
+    }
+    else
+    {
+       	printf("[SetAppPath]Set work Path[null].\n");
+        return false;
+    }
+#else
+		return true;
+#endif    
+}
+
 //遍历指定的目录，获得所有XML文件名
 bool Read_Xml_Folder(string folderPath, vec_Xml_File_Name& obj_vec_Xml_File_Name)
 {
@@ -61,25 +126,20 @@ bool Read_Xml_Folder(string folderPath, vec_Xml_File_Name& obj_vec_Xml_File_Name
         return false;
     }
 
-    chdir(folderPath.c_str());
+    //chdir(folderPath.c_str());
 
     while ((entry = readdir(dp)) != NULL)
     {
         lstat(entry->d_name, &statbuf);
-
-        if (S_ISDIR(statbuf.st_mode))
+				
+        if (DT_REG == entry->d_type)
         {
             if (strcmp(".", entry->d_name) == 0 || strcmp("..", entry->d_name) == 0)
             {
                 continue;
             }
 
-            //不需要支持子目录遍历
-            //printf("%*s%s/\n",depth,"",entry->d_name);
-            //dfsFolder(entry->d_name,depth+4);
-        }
-        else
-        {
+        		//printf("[Read_Xml_Folder]%s.\n", entry->d_name);
             if (strcmp("BaseType.xml", entry->d_name) != 0)
             {
                 string filename = folderPath + "/" + entry->d_name;
@@ -88,7 +148,7 @@ bool Read_Xml_Folder(string folderPath, vec_Xml_File_Name& obj_vec_Xml_File_Name
         }
     }
 
-    chdir("..");
+    //chdir("..");
     closedir(dp);
 #endif
     return true;
@@ -298,7 +358,6 @@ bool Read_XML_File(vec_Xml_File_Name& obj_vec_Xml_File_Name, vec_ObjectClass& ob
 
         obj_vec_ObjectClass.push_back(obj_ObjectClass);
 
-
     }
 
     return true;
@@ -310,6 +369,8 @@ int main()
     vec_Xml_File_Name obj_vec_Xml_File_Name;
     vec_ObjectClass  obj_vec_ObjectClass;
     vec_Base_Type_List obj_vec_Base_Type_List;
+    
+    SetAppPath();
 
     //获得基础类型名
     blRet = Read_Base_Type_XML_File(obj_vec_Base_Type_List);
@@ -320,6 +381,7 @@ int main()
         return 0;
     }
 
+		
     //获得所有的xml文件名
     blRet = Read_Xml_Folder(OBJECT_CONFIG_PATH, obj_vec_Xml_File_Name);
 
@@ -328,7 +390,9 @@ int main()
         printf("[Main]Read_Xml_Folder is fail.\n");
         return 0;
     }
-
+    
+    printf("[main]obj_vec_Xml_File_Name=%d.\n", obj_vec_Xml_File_Name.size());
+    
     //将所有的xml转化成ObjectClass描述数据结构
     blRet = Read_XML_File(obj_vec_Xml_File_Name, obj_vec_ObjectClass);
 
@@ -339,7 +403,10 @@ int main()
     }
 
     //创建公共头文件
-    Create_Base_Type_H(obj_vec_Base_Type_List);
+    if(false == Create_Base_Type_H(obj_vec_Base_Type_List))
+    {
+    	return 0;
+    }
 
     //创建基类文件
     Create_Base_Class_H();
@@ -354,7 +421,9 @@ int main()
 
     objReadObject.WriteListManager(obj_vec_ObjectClass, obj_vec_Base_Type_List);
     objReadObject.WriteTestManager(obj_vec_ObjectClass, obj_vec_Base_Type_List);
-
+    
+#ifdef WIN32
     getchar();
+#endif
     return 0;
 }
