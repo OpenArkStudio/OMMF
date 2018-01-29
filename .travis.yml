@@ -14,7 +14,7 @@ script:
   - cd $TRAVIS_BUILD_DIR/ECSTools   
   - make 
   - ls 
-  - ./$TRAVIS_BUILD_DIR/ECSTools/ECSTools
+  - ./ECSTools
   - cd $TRAVIS_BUILD_DIR/Test
   - make
-  - ./TRAVIS_BUILD_DIR/Test/ESCTest
+  - ./ESCTest
