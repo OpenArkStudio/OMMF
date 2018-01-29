@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <config>
 	<ClassInfo BuffSize="100" ClassType="2" ClassID="1001"  ListCount="10"/>
-	<CObject name="name" type="CarName" min="0" max="20" init=""/>
-	<CObject name="engine" type="CarName" min="0" max="20" init=""/>
+	<CObject name="name" type="CarName" min="0" max="20" init="None"/>
+	<CObject name="engine" type="CarName" min="0" max="20" init="None"/>
 	<CObject name="CarLong" type="uint16" min="0" max="300" init="0"/>
 	<CObject name="CarWide" type="uint16" min="0" max="200" init="0"/>
 	<CObject name="CarHigh" type="uint16" min="0" max="200" init="0"/>
