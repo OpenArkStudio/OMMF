@@ -16,7 +16,7 @@
 //设置当前代码路径
 bool SetAppPath()
 {
-#ifndef WIN32	
+#ifndef WIN32
     int nSize = (int)pathconf(".",_PC_PATH_MAX);
 
     if (nSize <= 0)
@@ -38,7 +38,7 @@ bool SetAppPath()
 
         if (stPathSize <= 0)
         {
-            printf("[SetAppPath]no find work Path.\n", szPath);
+            printf("[SetAppPath](%s)no find work Path.\n", szPath);
             delete[] pFilePath;
             return false;
         }
@@ -69,12 +69,13 @@ bool SetAppPath()
     }
     else
     {
-       	printf("[SetAppPath]Set work Path[null].\n");
+        printf("[SetAppPath]Set work Path[null].\n");
         return false;
     }
+
 #else
-		return true;
-#endif    
+    return true;
+#endif
 }
 
 //遍历指定的目录，获得所有XML文件名
@@ -131,7 +132,7 @@ bool Read_Xml_Folder(string folderPath, vec_Xml_File_Name& obj_vec_Xml_File_Name
     while ((entry = readdir(dp)) != NULL)
     {
         lstat(entry->d_name, &statbuf);
-				
+
         if (DT_REG == entry->d_type)
         {
             if (strcmp(".", entry->d_name) == 0 || strcmp("..", entry->d_name) == 0)
@@ -139,7 +140,7 @@ bool Read_Xml_Folder(string folderPath, vec_Xml_File_Name& obj_vec_Xml_File_Name
                 continue;
             }
 
-        		//printf("[Read_Xml_Folder]%s.\n", entry->d_name);
+            //printf("[Read_Xml_Folder]%s.\n", entry->d_name);
             if (strcmp("BaseType.xml", entry->d_name) != 0)
             {
                 string filename = folderPath + "/" + entry->d_name;
@@ -369,7 +370,7 @@ int main()
     vec_Xml_File_Name obj_vec_Xml_File_Name;
     vec_ObjectClass  obj_vec_ObjectClass;
     vec_Base_Type_List obj_vec_Base_Type_List;
-    
+
     SetAppPath();
 
     //获得基础类型名
@@ -381,7 +382,7 @@ int main()
         return 0;
     }
 
-		
+
     //获得所有的xml文件名
     blRet = Read_Xml_Folder(OBJECT_CONFIG_PATH, obj_vec_Xml_File_Name);
 
@@ -390,9 +391,9 @@ int main()
         printf("[Main]Read_Xml_Folder is fail.\n");
         return 0;
     }
-    
-    printf("[main]obj_vec_Xml_File_Name=%d.\n", obj_vec_Xml_File_Name.size());
-    
+
+    printf("[main]obj_vec_Xml_File_Name count=%d.\n", (int)obj_vec_Xml_File_Name.size());
+
     //将所有的xml转化成ObjectClass描述数据结构
     blRet = Read_XML_File(obj_vec_Xml_File_Name, obj_vec_ObjectClass);
 
@@ -405,7 +406,7 @@ int main()
     //创建公共头文件
     if(false == Create_Base_Type_H(obj_vec_Base_Type_List))
     {
-    	return 0;
+        return 0;
     }
 
     //创建基类文件
@@ -421,7 +422,7 @@ int main()
 
     objReadObject.WriteListManager(obj_vec_ObjectClass, obj_vec_Base_Type_List);
     objReadObject.WriteTestManager(obj_vec_ObjectClass, obj_vec_Base_Type_List);
-    
+
 #ifdef WIN32
     getchar();
 #endif
