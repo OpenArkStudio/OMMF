@@ -798,7 +798,7 @@ bool CReadObject::Create_Test_Manager_Cpp(vec_ObjectClass objObjectClassList, ve
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
         sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n");
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "return true;\n");
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\treturn true;\n");
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
         sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
@@ -815,13 +815,26 @@ bool CReadObject::Create_Test_Manager_Cpp(vec_ObjectClass objObjectClassList, ve
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tobjObjectManager.Init();\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tbool blRet = false;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
 
     for (int i = 0; i < (int)objObjectClassList.size(); i++)
     {
-        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tTest_%s(objObjectManager);\n", objObjectClassList[i].m_strClassName.c_str());
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tblRet = Test_%s(objObjectManager);\n", objObjectClassList[i].m_strClassName.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tif(false == blRet)\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t{\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn 0;\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n");
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     }
 
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tprintf(\"[main]Test Run is Success.\\n\");\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\treturn 0;\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
