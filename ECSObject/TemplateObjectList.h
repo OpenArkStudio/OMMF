@@ -2,8 +2,8 @@
 #define _TAMPLATEOBJECT_H
 
 #include "BaseObject.h"
-#include <stdio.h>
 #include <time.h>
+
 
 #define GUID_SIZE 24
 
@@ -24,7 +24,7 @@ static int Create_Object_UID(char* pObjectUID, int& nLen, int nType, int nPos)
 #ifdef WIN32
     localtime_s(&tmTime, &ttCurrentTime);
 #else
-    localtime_r(&tmTime, &ttCurrentTime);
+    localtime_r(&ttCurrentTime, &tmTime);
 #endif
     char szTimeNow[50] = { '\0' };
     sprintf(szTimeNow, "%04d%02d%02d%02d%02d%02d",

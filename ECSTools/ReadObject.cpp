@@ -671,7 +671,7 @@ bool CReadObject::Create_Test_Manager_Cpp(vec_ObjectClass objObjectClassList, ve
     //Ìí¼Ó²âÊÔº¯Êı
     for (int i = 0; i < (int)objObjectClassList.size(); i++)
     {
-        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "void Test_%s(CObjectManager& objObjectManager)\n", objObjectClassList[i].m_strClassName.c_str());
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "bool Test_%s(CObjectManager& objObjectManager)\n", objObjectClassList[i].m_strClassName.c_str());
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
         sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
@@ -692,7 +692,7 @@ bool CReadObject::Create_Test_Manager_Cpp(vec_ObjectClass objObjectClassList, ve
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
         sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tprintf(\"%s Create fail.\\n\");\n", objObjectClassList[i].m_strClassName.c_str());
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn;\n");
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn false;\n");
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
         sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n\n");
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
@@ -734,7 +734,7 @@ bool CReadObject::Create_Test_Manager_Cpp(vec_ObjectClass objObjectClassList, ve
                 sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tprintf(\"%s Set GetData is Not equal.\\n\");\n",
                              objObjectClassList[i].m_vec_Object_Info[j].m_strName.c_str());
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn;\n");
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn false;\n");
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
                 sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n");
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
@@ -776,7 +776,7 @@ bool CReadObject::Create_Test_Manager_Cpp(vec_ObjectClass objObjectClassList, ve
                 sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tprintf(\"%s Set GetData is Not equal.\\n\");\n",
                              objObjectClassList[i].m_vec_Object_Info[j].m_strName.c_str());
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn;\n");
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn false;\n");
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
                 sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n");
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
@@ -794,7 +794,11 @@ bool CReadObject::Create_Test_Manager_Cpp(vec_ObjectClass objObjectClassList, ve
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
         sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tprintf(\"[main]Delete szUID = %%s fail.\\n\", szUID);\n");
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn false;\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
         sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "return true;\n");
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
         sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
@@ -840,7 +844,7 @@ bool CReadObject::Create_Test_Make(vec_ObjectClass objObjectClassList, vec_Base_
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "default:all\n\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "PATS1 = main.o TestManager.o ../ECSObject/ObjectManager.o");
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "PATS1 = TestManager.o ../ECSObject/ObjectManager.o");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
     for (int i = 0; i < (int)objObjectClassList.size(); i++)
@@ -853,7 +857,7 @@ bool CReadObject::Create_Test_Make(vec_ObjectClass objObjectClassList, vec_Base_
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\n\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "LIB_BASE_OBJS1 = main.o TestManager.o ObjectManager.o");
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "LIB_BASE_OBJS1 = TestManager.o ObjectManager.o");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
     for (int i = 0; i < (int)objObjectClassList.size(); i++)
@@ -901,7 +905,7 @@ bool CReadObject::Create_Test_Make_Define(vec_ObjectClass objObjectClassList, ve
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "CFLAGS = -g -O2 -D__LINUX__\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "INCLUDES = -I./ -I../\n");
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "INCLUDES = -I./ -I../ -I../ECSObject\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "LIBS = -L/usr/lib64 -L/usr/local/lib64 -L/usr/local/lib -ldl\n\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);

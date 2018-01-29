@@ -18,6 +18,7 @@ bool CXmlOpeation::Init(const char* pFileName)
 
     if(NULL == m_pTiXmlDocument)
     {
+		
         return false;
     }
 
