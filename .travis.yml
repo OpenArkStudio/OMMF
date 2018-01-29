@@ -12,4 +12,8 @@ env:
 
 script:
   - cd $TRAVIS_BUILD_DIR/ECSTools   
-  - make    
+  - make 
+  - ./ECSTools
+  - cd $TRAVIS_BUILD_DIR/Test
+  - make
+  - ./ESCTest
