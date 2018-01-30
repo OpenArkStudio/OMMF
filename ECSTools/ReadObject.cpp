@@ -340,6 +340,62 @@ bool CReadObject::Create_Object_Cpp(int nIndex, vec_ObjectClass objObjectClassLi
                     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
                     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t{\n");
                     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+                    if (Get_Base_Type_Class(objObjectClassList[nIndex].m_vec_Object_Info[j].m_strType, obj_vec_Base_Type_List) == "single")
+                    {
+                        //如果是单个变量，比较变量数值区域
+                        if (objObjectClassList[nIndex].m_vec_Object_Info[j].m_strMin != "")
+                        {
+                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tif(Value < %s)\n", objObjectClassList[nIndex].m_vec_Object_Info[j].m_strMin.c_str());
+                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\t{\n");
+                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\t\treturn -1;\n");
+                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\t}\n\n");
+                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                        }
+
+                        if (objObjectClassList[nIndex].m_vec_Object_Info[j].m_strMax != "")
+                        {
+                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tif(Value > %s)\n", objObjectClassList[nIndex].m_vec_Object_Info[j].m_strMax.c_str());
+                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\t{\n");
+                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\t\treturn -1;\n");
+                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\t}\n\n");
+                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                        }
+                    }
+                    else
+                    {
+                        //处理数组的话，按照长度计算
+                        if (objObjectClassList[nIndex].m_vec_Object_Info[j].m_strMin != "")
+                        {
+                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tif(strlen(Value) < %s)\n", objObjectClassList[nIndex].m_vec_Object_Info[j].m_strMin.c_str());
+                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\t{\n");
+                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\t\treturn -1;\n");
+                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\t}\n\n");
+                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                        }
+
+                        if (objObjectClassList[nIndex].m_vec_Object_Info[j].m_strMax != "")
+                        {
+                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tif(strlen(Value) > %s)\n", objObjectClassList[nIndex].m_vec_Object_Info[j].m_strMax.c_str());
+                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\t{\n");
+                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\t\treturn -1;\n");
+                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\t}\n\n");
+                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                        }
+                    }
+
                     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tmemcpy(&m_szBuffPacket[m_vec_Object_Info_List[%d].m_nStartPos], (char* )&Value, m_vec_Object_Info_List[%d].m_nSize);\n", j, j);
                     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
                     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn %d;\n", nSize);
