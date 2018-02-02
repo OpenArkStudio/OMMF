@@ -9,14 +9,14 @@ public:
     CReadObject();
     ~CReadObject();
 
-    bool WriteClass(int i, vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List);
-    bool WriteListManager(vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List);
-    bool WriteTestManager(vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List);
+    bool WriteClass(int i, vec_ObjectClass objObjectClassList, _Base_Type_List_info obj_Base_Type_List_info);
+    bool WriteListManager(vec_ObjectClass objObjectClassList, _Base_Type_List_info obj_Base_Type_List_info);
+    bool WriteTestManager(vec_ObjectClass objObjectClassList, _Base_Type_List_info obj_Base_Type_List_info);
 
 private:
     bool Check_Type_In_Class(string strBaseTypeName, vec_Object_Info obj_vec_Object_Info);
-    bool Create_Object_H(int nIndex, vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List);
-    bool Create_Object_Cpp(int nIndex, vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List);
+    bool Create_Object_H(int nIndex, vec_ObjectClass objObjectClassList, _Base_Type_List_info obj_Base_Type_List_info);
+    bool Create_Object_Cpp(int nIndex, vec_ObjectClass objObjectClassList, _Base_Type_List_info obj_Base_Type_List_info);
 
     bool Create_List_Manager_H(vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List);
     bool Create_List_Manager_Cpp(vec_ObjectClass objObjectClassList, vec_Base_Type_List& obj_vec_Base_Type_List);

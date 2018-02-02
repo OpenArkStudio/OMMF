@@ -156,11 +156,11 @@ bool Read_Xml_Folder(string folderPath, vec_Xml_File_Name& obj_vec_Xml_File_Name
 }
 
 //读取基本类型声明表
-bool Read_Base_Type_XML_File(vec_Base_Type_List& obj_vec_Base_Type_List)
+bool Read_Base_Type_XML_File(_Base_Type_List_info& obj_Base_Type_List_info)
 {
     CXmlOpeation obj_MainConfig;
 
-    obj_vec_Base_Type_List.clear();
+    obj_Base_Type_List_info.m_vec_Base_Type_List.clear();
 
     if (false == obj_MainConfig.Init(OBJECT_BASETYPE_PATH))
     {
@@ -175,6 +175,7 @@ bool Read_Base_Type_XML_File(vec_Base_Type_List& obj_vec_Base_Type_List)
     TiXmlElement* pNextTiXmlElementType  = NULL;
     TiXmlElement* pNextTiXmlElementClass = NULL;
     TiXmlElement* pNextTiXmlElementSize  = NULL;
+    TiXmlElement* pNextTiXmlElementKey   = NULL;
 
     while (true)
     {
@@ -223,8 +224,26 @@ bool Read_Base_Type_XML_File(vec_Base_Type_List& obj_vec_Base_Type_List)
             break;
         }
 
+        pData = obj_MainConfig.GetData("CObject", "isobjectkey", pNextTiXmlElementKey);
 
-        obj_vec_Base_Type_List.push_back(obj_BaseType);
+        if (pData != NULL)
+        {
+            if (strcmp(pData, "yes") == 0)
+            {
+                //主键字段类型
+                if (obj_Base_Type_List_info.m_nKeyPos > 0)
+                {
+                    printf("[Read_Base_Type_XML_File]object key is exist.\n");
+                    return false;
+                }
+                else
+                {
+                    obj_Base_Type_List_info.m_nKeyPos = (int)obj_Base_Type_List_info.m_vec_Base_Type_List.size();
+                }
+            }
+        }
+
+        obj_Base_Type_List_info.m_vec_Base_Type_List.push_back(obj_BaseType);
     }
 
     return true;
@@ -368,13 +387,13 @@ int main()
 {
     bool blRet = false;
     vec_Xml_File_Name obj_vec_Xml_File_Name;
-    vec_ObjectClass  obj_vec_ObjectClass;
-    vec_Base_Type_List obj_vec_Base_Type_List;
+    _Base_Type_List_info obj_Base_Type_List_info;
+    vec_ObjectClass obj_vec_ObjectClass;
 
     SetAppPath();
 
     //获得基础类型名
-    blRet = Read_Base_Type_XML_File(obj_vec_Base_Type_List);
+    blRet = Read_Base_Type_XML_File(obj_Base_Type_List_info);
 
     if (false == blRet)
     {
@@ -382,6 +401,12 @@ int main()
         return 0;
     }
 
+    //看看有没有主键类型，没有则不进行代码生成
+    if (obj_Base_Type_List_info.m_nKeyPos == -1)
+    {
+        printf("[Main]Read_Base_Type_XML_File no find isobjectkey,you must set one.\n");
+        return 0;
+    }
 
     //获得所有的xml文件名
     blRet = Read_Xml_Folder(OBJECT_CONFIG_PATH, obj_vec_Xml_File_Name);
@@ -404,7 +429,7 @@ int main()
     }
 
     //创建公共头文件
-    if(false == Create_Base_Type_H(obj_vec_Base_Type_List))
+    if(false == Create_Base_Type_H(obj_Base_Type_List_info.m_vec_Base_Type_List))
     {
         return 0;
     }
@@ -417,11 +442,11 @@ int main()
 
     for (int i = 0; i < (int)obj_vec_ObjectClass.size(); i++)
     {
-        objReadObject.WriteClass(i, obj_vec_ObjectClass, obj_vec_Base_Type_List);
+        objReadObject.WriteClass(i, obj_vec_ObjectClass, obj_Base_Type_List_info);
     }
 
-    objReadObject.WriteListManager(obj_vec_ObjectClass, obj_vec_Base_Type_List);
-    objReadObject.WriteTestManager(obj_vec_ObjectClass, obj_vec_Base_Type_List);
+    objReadObject.WriteListManager(obj_vec_ObjectClass, obj_Base_Type_List_info);
+    objReadObject.WriteTestManager(obj_vec_ObjectClass, obj_Base_Type_List_info);
 
 #ifdef WIN32
     getchar();

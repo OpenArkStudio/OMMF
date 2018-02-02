@@ -69,11 +69,23 @@ struct _BaseType
 
     _BaseType()
     {
-        m_nLen = 0;
+        m_nLen    = 0;
     }
 };
 
 typedef vector<_BaseType> vec_Base_Type_List;
+
+//基本数据对象类型
+struct _Base_Type_List_info
+{
+    int m_nKeyPos;
+    vec_Base_Type_List m_vec_Base_Type_List;
+
+    _Base_Type_List_info()
+    {
+        m_nKeyPos = -1;
+    }
+};
 
 //验证对象是不是已定义的类型之一
 static bool Check_Base_Type(string strType, vec_Base_Type_List& obj_vec_Base_Type_List)
