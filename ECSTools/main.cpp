@@ -249,6 +249,100 @@ bool Read_Base_Type_XML_File(_Base_Type_List_info& obj_Base_Type_List_info)
     return true;
 }
 
+//遍历读取Message文件，还原类结构
+bool Read_Message_File(vec_Xml_File_Name& obj_vec_Xml_Message_Name, vec_Message_Info& obj_vec_Message_Info)
+{
+    obj_vec_Message_Info.clear();
+
+    for (int i = 0; i < (int)obj_vec_Xml_Message_Name.size(); i++)
+    {
+        printf("[Read_Message_File]filename=%s.\n", obj_vec_Xml_Message_Name[i].c_str());
+
+        _Message_Info obj_Message_Info;
+        CXmlOpeation obj_MainConfig;
+
+        if (false == obj_MainConfig.Init(obj_vec_Xml_Message_Name[i].c_str()))
+        {
+            printf("[Read_XML_File]File Read Error = %s.\n", obj_vec_Xml_Message_Name[i].c_str());
+            return false;
+        }
+
+        //解析类相关参数信息
+        char* pData = NULL;
+        obj_Message_Info.m_strMessageName = Get_File_From_Path(obj_vec_Xml_Message_Name[i]);
+
+        TiXmlElement* pNextTiXmlElementName = NULL;
+        TiXmlElement* pNextTiXmlElementType = NULL;
+        TiXmlElement* pNextTiXmlElementMin = NULL;
+        TiXmlElement* pNextTiXmlElementMax = NULL;
+        TiXmlElement* pNextTiXmlElementInit = NULL;
+
+        while (true)
+        {
+            _Object_Info obj_Object_Info;
+            pData = obj_MainConfig.GetData("CObject", "name", pNextTiXmlElementName);
+
+            if (pData != NULL)
+            {
+                obj_Object_Info.m_strName = (string)pData;
+            }
+            else
+            {
+                break;
+            }
+
+            pData = obj_MainConfig.GetData("CObject", "type", pNextTiXmlElementType);
+
+            if (pData != NULL)
+            {
+                obj_Object_Info.m_strType = (string)pData;
+            }
+            else
+            {
+                break;
+            }
+
+            pData = obj_MainConfig.GetData("CObject", "min", pNextTiXmlElementMin);
+
+            if (pData != NULL)
+            {
+                obj_Object_Info.m_strMin = (string)pData;
+            }
+            else
+            {
+                obj_Object_Info.m_strMin = "";
+            }
+
+            pData = obj_MainConfig.GetData("CObject", "max", pNextTiXmlElementMax);
+
+            if (pData != NULL)
+            {
+                obj_Object_Info.m_strMax = (string)pData;
+            }
+            else
+            {
+                obj_Object_Info.m_strMax = "";
+            }
+
+            pData = obj_MainConfig.GetData("CObject", "init", pNextTiXmlElementInit);
+
+            if (pData != NULL)
+            {
+                obj_Object_Info.m_strInit = (string)pData;
+            }
+            else
+            {
+                obj_Object_Info.m_strInit = "";
+            }
+
+            obj_Message_Info.m_vec_Object_Info.push_back(obj_Object_Info);
+        }
+
+        obj_vec_Message_Info.push_back(obj_Message_Info);
+    }
+
+    return true;
+}
 
 //遍历读取XML文件，还原类结构
 bool Read_XML_File(vec_Xml_File_Name& obj_vec_Xml_File_Name, vec_ObjectClass& obj_vec_ObjectClass)
@@ -387,8 +481,10 @@ int main()
 {
     bool blRet = false;
     vec_Xml_File_Name obj_vec_Xml_File_Name;
+    vec_Xml_File_Name obj_vec_Xml_Message_Name;
     _Base_Type_List_info obj_Base_Type_List_info;
     vec_ObjectClass obj_vec_ObjectClass;
+    vec_Message_Info obj_vec_Message_Info;
 
     SetAppPath();
 
@@ -408,12 +504,21 @@ int main()
         return 0;
     }
 
-    //获得所有的xml文件名
+    //获得所有的xml对象文件名
     blRet = Read_Xml_Folder(OBJECT_CONFIG_PATH, obj_vec_Xml_File_Name);
 
     if (false == blRet)
     {
         printf("[Main]Read_Xml_Folder is fail.\n");
+        return 0;
+    }
+
+    //获得所有的Message对象文件
+    blRet = Read_Xml_Folder(OBJECT_MESSAGE_PATH, obj_vec_Xml_Message_Name);
+
+    if (false == blRet)
+    {
+        printf("[Main]Read_Xml_Message is fail.\n");
         return 0;
     }
 
@@ -425,6 +530,15 @@ int main()
     if (false == blRet)
     {
         printf("[Main]Read_XML_File is fail.\n");
+        return 0;
+    }
+
+    //将所有的xml转化成message描述的数据结构
+    blRet = Read_Message_File(obj_vec_Xml_Message_Name, obj_vec_Message_Info);
+
+    if (false == blRet)
+    {
+        printf("[Main]Read_Message_File is fail.\n");
         return 0;
     }
 
@@ -443,6 +557,11 @@ int main()
     for (int i = 0; i < (int)obj_vec_ObjectClass.size(); i++)
     {
         objReadObject.WriteClass(i, obj_vec_ObjectClass, obj_Base_Type_List_info);
+    }
+
+    for (int i = 0; i < (int)obj_vec_Message_Info.size(); i++)
+    {
+        objReadObject.WriteMessage(obj_vec_Message_Info[i], obj_Base_Type_List_info);
     }
 
     objReadObject.WriteListManager(obj_vec_ObjectClass, obj_Base_Type_List_info);

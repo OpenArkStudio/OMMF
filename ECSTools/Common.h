@@ -15,8 +15,10 @@
 
 using namespace std;
 
+#define OBJECT_MESSAGE_PATH      "../ObjectMessage"
 #define OBJECT_CONFIG_PATH       "../ObjectConfig"
 #define OBJECT_OUTPUT_PATH       "../ECSObject"
+#define MESSAGE_OUTPUT_PATH      "../ECSMessage"
 #define OBJECT_BASETYPE_PATH     "../ObjectConfig/BaseType.xml"
 #define OBJECT_BASETYPE_FILE     "BaseType.h"
 #define OBJECT_BASECLASS_FILE    "BaseObject.h"
@@ -36,6 +38,14 @@ struct _Object_Info
 };
 
 typedef vector<_Object_Info> vec_Object_Info;
+
+struct _Message_Info
+{
+    string          m_strMessageName;      //消息类名
+    vec_Object_Info m_vec_Object_Info;     //消息类对象
+};
+
+typedef vector<_Message_Info> vec_Message_Info;
 
 struct _ObjectClass
 {

@@ -10,6 +10,23 @@ CReadObject::~CReadObject()
 
 }
 
+bool CReadObject::WriteMessage(_Message_Info objMessageInfo, _Base_Type_List_info obj_Base_Type_List_info)
+{
+    if (false == Create_Message_H(objMessageInfo, obj_Base_Type_List_info))
+    {
+        printf("[CReadObject::WriteClass]Create (%s) H file error.\n", objMessageInfo.m_strMessageName.c_str());
+        return false;
+    }
+
+    if (false == Create_Message_Cpp(objMessageInfo, obj_Base_Type_List_info))
+    {
+        printf("[CReadObject::WriteClass]Create (%s) Cpp file error.\n", objMessageInfo.m_strMessageName.c_str());
+        return false;
+    }
+
+    return true;
+}
+
 bool CReadObject::WriteClass(int i, vec_ObjectClass objObjectClassList, _Base_Type_List_info obj_Base_Type_List_info)
 {
     //首先创建头文件
@@ -532,6 +549,67 @@ bool CReadObject::Create_Object_Cpp(int nIndex, vec_ObjectClass objObjectClassLi
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
     fclose(pFile);
+
+    return true;
+}
+
+bool CReadObject::Create_Message_H(_Message_Info objMessageInfo, _Base_Type_List_info obj_Base_Type_List_info)
+{
+    char szHFileName[200] = { '\0' };
+    char szCodeLine[MAX_CODE_LINE_SIZE] = { '\0' };
+
+    sprintf(szHFileName, "%s//%s.h", MESSAGE_OUTPUT_PATH, objMessageInfo.m_strMessageName.c_str());
+    FILE* pFile = fopen(szHFileName, "w");
+
+    if (NULL == pFile)
+    {
+        printf("[CReadObject::Create_Object_H]fopen(%s) error.\n", szHFileName);
+        return false;
+    }
+
+    char szDefine[200] = { '\0' };
+    To_Upper_String(objMessageInfo.m_strMessageName.c_str(), szDefine);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#ifndef _%s_H\n", szDefine);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#define _%s_H\n\n", szDefine);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#include \"BaseType.h\"\n\n", szDefine);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "class C%s\n", objMessageInfo.m_strMessageName.c_str());
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "public:\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tC%s() {};\n", objMessageInfo.m_strMessageName.c_str());
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t~C%s() {};\n", objMessageInfo.m_strMessageName.c_str());
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "public:\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    for (int i = 0; i < (int)objMessageInfo.m_vec_Object_Info.size(); i++)
+    {
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t%s m_%s;\n",
+                     objMessageInfo.m_vec_Object_Info[i].m_strName.c_str(),
+                     objMessageInfo.m_vec_Object_Info[i].m_strName.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "};\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#endif\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    fclose(pFile);
+    return true;
+}
+
+bool CReadObject::Create_Message_Cpp(_Message_Info objMessageInfo, _Base_Type_List_info obj_Base_Type_List_info)
+{
+
 
     return true;
 }

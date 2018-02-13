@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<CObject name="Msisdn" type="Phone" min="11" max="16" init="None" />
+</config>

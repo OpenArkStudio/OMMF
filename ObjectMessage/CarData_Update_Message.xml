@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<CObject name="Msisdn" type="Phone" min="11" max="16" init="None" />
+	<CObject name="Longitude" type="uint32" max="180" init="0" />
+	<CObject name="Latitude" type="uint32" max="180" init="0" />
+	<CObject name="Speed" type="uint16" max="200"  init="10" />
+	<CObject name="CarType" type="GUID"/>
+</config>
