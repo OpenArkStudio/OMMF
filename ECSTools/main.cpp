@@ -263,7 +263,7 @@ bool Read_Message_File(vec_Xml_File_Name& obj_vec_Xml_Message_Name, vec_Message_
 
         if (false == obj_MainConfig.Init(obj_vec_Xml_Message_Name[i].c_str()))
         {
-            printf("[Read_XML_File]File Read Error = %s.\n", obj_vec_Xml_Message_Name[i].c_str());
+            printf("[Read_Function_File]File Read Error = %s.\n", obj_vec_Xml_Message_Name[i].c_str());
             return false;
         }
 
@@ -339,6 +339,57 @@ bool Read_Message_File(vec_Xml_File_Name& obj_vec_Xml_Message_Name, vec_Message_
         }
 
         obj_vec_Message_Info.push_back(obj_Message_Info);
+    }
+
+    return true;
+}
+
+//还原Function数据结构
+bool Read_Function_File(vec_Xml_File_Name& obj_vec_Xml_Function_Name, vec_Message_Info obj_vec_Message_Info, vec_Function_Info& obj_vec_Function_Info)
+{
+    for (int i = 0; i < (int)obj_vec_Xml_Function_Name.size(); i++)
+    {
+        printf("[Read_Function_File]filename=%s.\n", obj_vec_Xml_Function_Name[i].c_str());
+
+        _Function_Info obj_Function_Info;
+        CXmlOpeation obj_MainConfig;
+
+        if (false == obj_MainConfig.Init(obj_vec_Xml_Function_Name[i].c_str()))
+        {
+            printf("[Read_Function_File]File Read Error = %s.\n", obj_vec_Xml_Function_Name[i].c_str());
+            return false;
+        }
+
+        //解析类相关参数信息
+        char* pData = NULL;
+        obj_Function_Info.m_strFunctionName = Get_File_From_Path(obj_vec_Xml_Function_Name[i]);
+        pData = obj_MainConfig.GetData("CMessageIn", "name");
+
+        if (NULL != pData)
+        {
+            if (false == Check_Message((string)pData, obj_vec_Message_Info))
+            {
+                printf("[Read_Function_File]MessageIn not exist Error = %s.\n", pData);
+                return false;
+            }
+
+            obj_Function_Info.m_strMessageIn = (string)pData;
+        }
+
+        pData = obj_MainConfig.GetData("CMessageOut", "name");
+
+        if (NULL != pData)
+        {
+            if (false == Check_Message((string)pData, obj_vec_Message_Info))
+            {
+                printf("[Read_Function_File]MessageOut not exist Error = %s.\n", pData);
+                return false;
+            }
+
+            obj_Function_Info.m_strMessageOut = (string)pData;
+        }
+
+        obj_vec_Function_Info.push_back(obj_Function_Info);
     }
 
     return true;
@@ -480,11 +531,13 @@ bool Read_XML_File(vec_Xml_File_Name& obj_vec_Xml_File_Name, vec_ObjectClass& ob
 int main()
 {
     bool blRet = false;
-    vec_Xml_File_Name obj_vec_Xml_File_Name;
-    vec_Xml_File_Name obj_vec_Xml_Message_Name;
+    vec_Xml_File_Name    obj_vec_Xml_File_Name;
+    vec_Xml_File_Name    obj_vec_Xml_Message_Name;
+    vec_Xml_File_Name    obj_vec_Xml_Function_Name;
     _Base_Type_List_info obj_Base_Type_List_info;
-    vec_ObjectClass obj_vec_ObjectClass;
-    vec_Message_Info obj_vec_Message_Info;
+    vec_ObjectClass      obj_vec_ObjectClass;
+    vec_Message_Info     obj_vec_Message_Info;
+    vec_Function_Info    obj_vec_Function_Info;
 
     SetAppPath();
 
@@ -522,6 +575,15 @@ int main()
         return 0;
     }
 
+    //获得所有的Function对象文件
+    blRet = Read_Xml_Folder(FUNCTION_CONFIG_PATH, obj_vec_Xml_Function_Name);
+
+    if (false == blRet)
+    {
+        printf("[Main]Read_Xml_Function is fail.\n");
+        return 0;
+    }
+
     printf("[main]obj_vec_Xml_File_Name count=%d.\n", (int)obj_vec_Xml_File_Name.size());
 
     //将所有的xml转化成ObjectClass描述数据结构
@@ -539,6 +601,15 @@ int main()
     if (false == blRet)
     {
         printf("[Main]Read_Message_File is fail.\n");
+        return 0;
+    }
+
+    //将所有的xml转化为Function描述的数据结构
+    blRet = Read_Function_File(obj_vec_Xml_Function_Name, obj_vec_Message_Info, obj_vec_Function_Info);
+
+    if (false == blRet)
+    {
+        printf("[Main]Read_Function_File is fail.\n");
         return 0;
     }
 
@@ -562,6 +633,11 @@ int main()
     for (int i = 0; i < (int)obj_vec_Message_Info.size(); i++)
     {
         objReadObject.WriteMessage(obj_vec_Message_Info[i], obj_Base_Type_List_info);
+    }
+
+    for (int i = 0; i < (int)obj_vec_Function_Info.size(); i++)
+    {
+        objReadObject.WriteFunction(obj_vec_Function_Info[i]);
     }
 
     objReadObject.WriteListManager(obj_vec_ObjectClass, obj_Base_Type_List_info);

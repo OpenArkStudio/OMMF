@@ -10,17 +10,28 @@ CReadObject::~CReadObject()
 
 }
 
+bool CReadObject::WriteFunction(_Function_Info& obj_Function_Info)
+{
+    if (false == Create_Function_H(obj_Function_Info))
+    {
+        printf("[CReadObject::WriteFunction]Create (%s) H file error.\n", obj_Function_Info.m_strFunctionName.c_str());
+        return false;
+    }
+
+    if (false == Create_Function_Cpp(obj_Function_Info))
+    {
+        printf("[CReadObject::WriteFunction]Create (%s) H file error.\n", obj_Function_Info.m_strFunctionName.c_str());
+        return false;
+    }
+
+    return true;
+}
+
 bool CReadObject::WriteMessage(_Message_Info objMessageInfo, _Base_Type_List_info obj_Base_Type_List_info)
 {
     if (false == Create_Message_H(objMessageInfo, obj_Base_Type_List_info))
     {
         printf("[CReadObject::WriteClass]Create (%s) H file error.\n", objMessageInfo.m_strMessageName.c_str());
-        return false;
-    }
-
-    if (false == Create_Message_Cpp(objMessageInfo, obj_Base_Type_List_info))
-    {
-        printf("[CReadObject::WriteClass]Create (%s) Cpp file error.\n", objMessageInfo.m_strMessageName.c_str());
         return false;
     }
 
@@ -607,10 +618,169 @@ bool CReadObject::Create_Message_H(_Message_Info objMessageInfo, _Base_Type_List
     return true;
 }
 
-bool CReadObject::Create_Message_Cpp(_Message_Info objMessageInfo, _Base_Type_List_info obj_Base_Type_List_info)
+bool CReadObject::Create_Function_H(_Function_Info& obj_Function_Info)
 {
+    char szHFileName[200] = { '\0' };
+    char szCodeLine[MAX_CODE_LINE_SIZE] = { '\0' };
 
+    sprintf(szHFileName, "%s//%s.h", FUNCTION_OUTPUT_PATH, obj_Function_Info.m_strFunctionName.c_str());
+    FILE* pFile = fopen(szHFileName, "w");
 
+    if (NULL == pFile)
+    {
+        printf("[CReadObject::Create_Function_H]fopen(%s) error.\n", szHFileName);
+        return false;
+    }
+
+    char szDefine[200] = { '\0' };
+    To_Upper_String(obj_Function_Info.m_strFunctionName.c_str(), szDefine);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#ifndef _%s_H\n", szDefine);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#define _%s_H\n\n", szDefine);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    if(obj_Function_Info.m_strMessageIn != "")
+    {
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#include \"%s.h\"\n", obj_Function_Info.m_strMessageIn.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+
+    if (obj_Function_Info.m_strMessageOut != "")
+    {
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#include \"%s.h\"\n", obj_Function_Info.m_strMessageOut.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "Class C%s\n", obj_Function_Info.m_strFunctionName.c_str());
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "public:\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tC%s();\n", obj_Function_Info.m_strFunctionName.c_str());
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t~C%s();\n", obj_Function_Info.m_strFunctionName.c_str());
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    if (obj_Function_Info.m_strMessageIn != "" && obj_Function_Info.m_strMessageOut != "")
+    {
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tint Execute(C%s* obj_In_%s, C%s* obj_Out_%s);\n",
+                     obj_Function_Info.m_strMessageIn.c_str(),
+                     obj_Function_Info.m_strMessageIn.c_str(),
+                     obj_Function_Info.m_strMessageOut.c_str(),
+                     obj_Function_Info.m_strMessageOut.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+    else if(obj_Function_Info.m_strMessageIn == "" && obj_Function_Info.m_strMessageOut != "")
+    {
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tint Execute(C%s* obj_Out_%s);\n",
+                     obj_Function_Info.m_strMessageOut.c_str(),
+                     obj_Function_Info.m_strMessageOut.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+    else if(obj_Function_Info.m_strMessageIn != "" && obj_Function_Info.m_strMessageOut == "")
+    {
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tint Execute(C%s* obj_In_%s);\n",
+                     obj_Function_Info.m_strMessageIn.c_str(),
+                     obj_Function_Info.m_strMessageIn.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+    else
+    {
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tint Execute();\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "};\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    fclose(pFile);
+    return true;
+}
+
+bool CReadObject::Create_Function_Cpp(_Function_Info& obj_Function_Info)
+{
+    char szHFileName[200] = { '\0' };
+    char szCodeLine[MAX_CODE_LINE_SIZE] = { '\0' };
+
+    sprintf(szHFileName, "%s//%s.cpp", FUNCTION_OUTPUT_PATH, obj_Function_Info.m_strFunctionName.c_str());
+    FILE* pFile = fopen(szHFileName, "w");
+
+    if (NULL == pFile)
+    {
+        printf("[CReadObject::Create_Function_H]fopen(%s) error.\n", szHFileName);
+        return false;
+    }
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#include \"%s.h\"\n\n", obj_Function_Info.m_strFunctionName.c_str());
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    //创建构造函数
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "C%s::C%s\n",
+                 obj_Function_Info.m_strFunctionName.c_str(),
+                 obj_Function_Info.m_strFunctionName.c_str());
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    //创造析构函数
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "C%s::~C%s\n",
+                 obj_Function_Info.m_strFunctionName.c_str(),
+                 obj_Function_Info.m_strFunctionName.c_str());
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    //添加Execute函数
+    if (obj_Function_Info.m_strMessageIn != "" && obj_Function_Info.m_strMessageOut != "")
+    {
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "int C%s::Execute(C%s* obj_In_%s, C%s* obj_Out_%s)\n",
+                     obj_Function_Info.m_strFunctionName.c_str(),
+                     obj_Function_Info.m_strMessageIn.c_str(),
+                     obj_Function_Info.m_strMessageIn.c_str(),
+                     obj_Function_Info.m_strMessageOut.c_str(),
+                     obj_Function_Info.m_strMessageOut.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+    else if (obj_Function_Info.m_strMessageIn == "" && obj_Function_Info.m_strMessageOut != "")
+    {
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "int C%s::Execute(C%s* obj_Out_%s)\n",
+                     obj_Function_Info.m_strFunctionName.c_str(),
+                     obj_Function_Info.m_strMessageOut.c_str(),
+                     obj_Function_Info.m_strMessageOut.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+    else if (obj_Function_Info.m_strMessageIn != "" && obj_Function_Info.m_strMessageOut == "")
+    {
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "int C%s::Execute(C%s* obj_In_%s)\n",
+                     obj_Function_Info.m_strFunctionName.c_str(),
+                     obj_Function_Info.m_strMessageIn.c_str(),
+                     obj_Function_Info.m_strMessageIn.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+    else
+    {
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "int C%s::Execute()\n",
+                     obj_Function_Info.m_strFunctionName.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t//add your code\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\treturn 0;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    fclose(pFile);
     return true;
 }
 

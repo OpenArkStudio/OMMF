@@ -15,10 +15,12 @@
 
 using namespace std;
 
+#define FUNCTION_CONFIG_PATH     "../Function"
 #define OBJECT_MESSAGE_PATH      "../ObjectMessage"
 #define OBJECT_CONFIG_PATH       "../ObjectConfig"
 #define OBJECT_OUTPUT_PATH       "../ECSObject"
 #define MESSAGE_OUTPUT_PATH      "../ECSMessage"
+#define FUNCTION_OUTPUT_PATH     "../ECSFunction"
 #define OBJECT_BASETYPE_PATH     "../ObjectConfig/BaseType.xml"
 #define OBJECT_BASETYPE_FILE     "BaseType.h"
 #define OBJECT_BASECLASS_FILE    "BaseObject.h"
@@ -27,6 +29,15 @@ using namespace std;
 #define OBJECT_TEST_FILENAME     "TestManager"
 
 #define MAX_CODE_LINE_SIZE 500
+
+struct _Function_Info
+{
+    string m_strFunctionName;       //处理函数类名称
+    string m_strMessageIn;          //入口Message
+    string m_strMessageOut;         //出口Message
+};
+
+typedef vector<_Function_Info> vec_Function_Info;
 
 struct _Object_Info
 {
@@ -96,6 +107,23 @@ struct _Base_Type_List_info
         m_nKeyPos = -1;
     }
 };
+
+//验证当前Message是否是
+static bool Check_Message(string strMessage, vec_Message_Info& obj_vec_Message_Info)
+{
+    bool blRet = false;
+
+    for (int i = 0; i < (int)obj_vec_Message_Info.size(); i++)
+    {
+        if (obj_vec_Message_Info[i].m_strMessageName == strMessage)
+        {
+            blRet = true;
+            break;
+        }
+    }
+
+    return blRet;
+}
 
 //验证对象是不是已定义的类型之一
 static bool Check_Base_Type(string strType, vec_Base_Type_List& obj_vec_Base_Type_List)

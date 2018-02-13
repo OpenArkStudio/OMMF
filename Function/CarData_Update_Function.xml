@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<CMessageIn name="CarData_Insert_Message" />
+	<CMessageOut name="CarData_Return_Message" />
+</config>
