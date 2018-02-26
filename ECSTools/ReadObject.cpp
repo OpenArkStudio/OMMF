@@ -1199,12 +1199,12 @@ bool CReadObject::Create_Test_Make(vec_ObjectClass objObjectClassList, vec_Base_
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "default:all\n\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "PATS1 = TestManager.o ../ECSObject/ObjectManager.o");
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "PATS1 = TestManager.o ../OMMFObject/ObjectManager.o");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
     for (int i = 0; i < (int)objObjectClassList.size(); i++)
     {
-        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, " ../ECSObject/%s.o",
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, " ../OMMFObject/%s.o",
                      objObjectClassList[i].m_strClassName.c_str());
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     }
