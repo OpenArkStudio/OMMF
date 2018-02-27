@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>ESCTools</ProjectName>
+    <ProjectName>OMMFTools</ProjectName>
     <ProjectGuid>{17D6CF7E-FECA-1BAD-99B5-9C010000002E}</ProjectGuid>
     <RootNamespace>ESCTools</RootNamespace>
     <Keyword>Win32Proj</Keyword>
