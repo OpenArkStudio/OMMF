@@ -6,7 +6,7 @@ PATS1 = ./TinyXML/tinyxml.o ./TinyXML/tinyxmlerror.o ./TinyXML/tinyxmlparser.o .
 
 LIB_BASE_OBJS1 = tinyxml.o tinyxmlerror.o tinyxmlparser.o tinystr.o main.o ReadObject.o XmlOpeation.o 
 
-LIB_BASE1 = ECSTools
+LIB_BASE1 = OMMFTools
 
 all:$(LIB_BASE1) Makefile
 

@@ -11,10 +11,10 @@ env:
     - COMPILER=g++-7
 
 script:
-  - cd $TRAVIS_BUILD_DIR/ECSTools   
+  - cd $TRAVIS_BUILD_DIR/OMMFTools   
   - make 
   - ls 
-  - ./ECSTools
+  - ./OMMFTools
   - cd $TRAVIS_BUILD_DIR/Test
   - make
   - ./ESCTest
