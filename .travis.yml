@@ -9,7 +9,21 @@ branches:
 env:
   global:
     - COMPILER=g++-7
+    - secure: "zzHyxI8PFxDW7xjWpVkFbFxUa+nHRZg2goqbncgx7T8fLUc0LkPVkIqO2p8MSdgsA1hgE1fsERTw3sGek8yxuPXf0wFE7DzZ+bvHfavpqYyG8WCfUZk0jHvqaW3CC48JIAhv3gWSctf6PdO+lwJnG3vY9Cs/oFevw4QeKMoEZQ/yVyhUKLipcRtYAYOLDRdffE9ALO3twpPZFUArIqD7fQx0IHB1oyXpdZbkrPIybrBdBxyaIYuVQ+/56Be9QHO92Zex1XJYShGGNN+NfzZKM7X/pfhpf7tAlJL/RalEoYWNxEM5lKbDdVpS/Bju2YWj0ugu89GhJkMSNvVRLcy2loTyETk5aVxCV6g+PARmlQxsrcrpKmUc7Rp191jPNnobhAs+Laa1u5KN5aNwFTe+xjM/aMyFSYdXVhApmNKQ4cH3tWtesoOzOCASWKszzUMm7FeuF7ttCdW3c820zichXmtnefVgc2H0yqXb+Tr1q3ztYSj5ophrtyGDHg77iVREJ4zo5I2JcYwNkJvUFzLPabr5ENq3+xrX1Ak9ld1TmweqPn/33qKmtfqB+YqTskzuLwET4nhRRfl+Jz7gvawCuSbGcBF0WR5xtn1HA8QD5oFGwQOE+YU7NVAkwKLHFUMFnsjY6DfJeuq8STS3i+L4FvqwX4fZdOk/BLhNXpfejzM="
 
+before_install:
+  - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-    
+    
+addons:
+  coverity_scan:
+    project:
+      name: "freeeyes/OMMF"
+      description: "test"
+    notification_email: "freeeyes@163.com"
+    build_command_prepend: "cd $TRAVIS_BUILD_DIR/OMMFTools"
+    build_command: "make"
+    branch_pattern: master
+    
 script:
   - cd $TRAVIS_BUILD_DIR/OMMFTools   
   - make 
