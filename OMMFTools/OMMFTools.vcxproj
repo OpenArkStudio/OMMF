@@ -304,7 +304,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ECSObject\System.h" />
-    <ClInclude Include="..\ECSObject\TemplateObjectList.h" />
+    <ClInclude Include="..\OMMFObject\TemplateObjectList.h" />
     <ClInclude Include=".\ReadObject.h" />
     <ClInclude Include=".\TinyXML\tinystr.h" />
     <ClInclude Include=".\TinyXML\tinyxml.h" />
