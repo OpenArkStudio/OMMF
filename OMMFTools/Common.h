@@ -154,6 +154,44 @@ static int copyFile(const char* src, const char* des)
     return nRet;
 }
 
+//创建多级文件
+static void mkdirs(char* muldir)
+{
+    int i, len;
+    char str[512];
+    strncpy(str, muldir, 512);
+    len = strlen(str);
+
+    for (i = 0; i < len; i++)
+    {
+        if (str[i] == '/')
+        {
+            str[i] = '\0';
+
+            if (access(str, 0) != 0)
+            {
+#ifdef WIN32
+                mkdir(str);
+#else
+                mkdir(str, 0777);
+#endif
+            }
+
+            str[i] = '/';
+        }
+    }
+
+    if (len > 0 && access(str, 0) != 0)
+    {
+#ifdef WIN32
+        mkdir(str);
+#else
+        mkdir(str, 0777);
+#endif
+    }
+
+    return;
+}
 
 //查看指定目录是否存在，不存在则创建之
 static bool Create_Project_Path(const char* pPath)
