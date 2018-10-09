@@ -1302,7 +1302,7 @@ bool CReadObject::Create_Test_Make_Define(vec_ObjectClass objObjectClassList, ve
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "CFLAGS = -g -O2 -D__LINUX__\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "INCLUDES = -I./ -I../ -I../OMMFObject\n");
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "INCLUDES = -I./ -I../ -I../ProjectCode/OMMFObject\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "LIBS = -L/usr/lib64 -L/usr/local/lib64 -L/usr/local/lib -ldl\n\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
