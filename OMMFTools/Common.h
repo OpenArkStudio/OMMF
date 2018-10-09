@@ -10,13 +10,14 @@
 #include<iostream>
 #include<fstream>
 #include <string>
-#include <direct.h>
+
 
 #ifdef WIN32
 #include <io.h>
-
+#include <direct.h>
 #else
 #include <unistd.h>
+#include <dirent.h>
 #endif
 
 #include "XmlOpeation.h"
