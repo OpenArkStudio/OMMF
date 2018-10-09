@@ -1049,7 +1049,7 @@ bool CReadObject::Create_Test_Manager_Cpp(vec_ObjectClass objObjectClassList, ve
     sprintf(szHFileName, "%s//%s.cpp", OBJECT_TEST_PATH, OBJECT_TEST_FILENAME);
     FILE* pFile = fopen(szHFileName, "w");
 
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#include \"ProjectCode\\ObjectManager.h\"\n\n", OBJECT_LIST_MANAGER_NAME);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#include \"ObjectManager.h\"\n\n", OBJECT_LIST_MANAGER_NAME);
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
     //Ìí¼Ó²âÊÔº¯Êý
