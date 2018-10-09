@@ -10,6 +10,14 @@
 #include<iostream>
 #include<fstream>
 #include <string>
+#include <direct.h>
+
+#ifdef WIN32
+#include <io.h>
+
+#else
+#include <unistd.h>
+#endif
 
 #include "XmlOpeation.h"
 
@@ -18,9 +26,9 @@ using namespace std;
 #define FUNCTION_CONFIG_PATH     "../Function"
 #define OBJECT_MESSAGE_PATH      "../ObjectMessage"
 #define OBJECT_CONFIG_PATH       "../ObjectConfig"
-#define OBJECT_OUTPUT_PATH       "../OMMFObject"
-#define MESSAGE_OUTPUT_PATH      "../OMMFMessage"
-#define FUNCTION_OUTPUT_PATH     "../OMMFFunction"
+#define OBJECT_OUTPUT_PATH       "../ProjectCode/OMMFObject"
+#define MESSAGE_OUTPUT_PATH      "../ProjectCode/OMMFMessage"
+#define FUNCTION_OUTPUT_PATH     "../ProjectCode/OMMFFunction"
 #define OBJECT_BASETYPE_PATH     "../ObjectConfig/BaseType.xml"
 #define OBJECT_BASETYPE_FILE     "BaseType.h"
 #define OBJECT_BASECLASS_FILE    "BaseObject.h"
@@ -108,6 +116,36 @@ struct _Base_Type_List_info
     }
 };
 
+//查看指定目录是否存在，不存在则创建之
+static bool Create_Project_Path(const char* pPath)
+{
+    int nflag = 0;
+    //查看文件夹有没有写权限
+    int nRet = access(pPath, 02);
+
+    if (0 != nRet)
+    {
+        //需要创建文件夹
+#ifdef WIN32
+        nflag = mkdir(pPath);
+#else
+        nflag = mkdir(pPath, 0777);
+#endif
+
+        if (nflag == 0)
+        {
+            return true;
+        }
+        else
+        {
+            printf("[Create_Project_Path]Create Path(%s) error.\n", pPath);
+            return false;
+        }
+    }
+
+    return true;
+}
+
 //验证当前Message是否是
 static bool Check_Message(string strMessage, vec_Message_Info& obj_vec_Message_Info)
 {
@@ -190,6 +228,12 @@ static bool Create_Base_Class_H()
     char szHFileName[200] = { '\0' };
     char szCodeLine[MAX_CODE_LINE_SIZE] = { '\0' };
 
+    //创建对应目录
+    if (Create_Project_Path(OBJECT_OUTPUT_PATH) == false)
+    {
+        return false;
+    }
+
     sprintf(szHFileName, "%s//%s", OBJECT_OUTPUT_PATH, OBJECT_BASECLASS_FILE);
     FILE* pFile = fopen(szHFileName, "w");
 
@@ -234,6 +278,12 @@ static bool Create_Base_Type_H(vec_Base_Type_List& obj_vec_Base_Type_List)
 {
     char szHFileName[200] = { '\0' };
     char szCodeLine[MAX_CODE_LINE_SIZE] = { '\0' };
+
+    //创建对应目录
+    if (Create_Project_Path(OBJECT_OUTPUT_PATH) == false)
+    {
+        return false;
+    }
 
     sprintf(szHFileName, "%s//%s", OBJECT_OUTPUT_PATH, OBJECT_BASETYPE_FILE);
     FILE* pFile = fopen(szHFileName, "w");
@@ -359,5 +409,7 @@ static string Get_File_From_Path(string strPath)
 
     return (string)szFileName;
 }
+
+
 
 #endif

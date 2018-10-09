@@ -114,6 +114,12 @@ bool CReadObject::Create_Object_H(int nIndex, vec_ObjectClass objObjectClassList
     char szHFileName[200] = { '\0' };
     char szCodeLine[MAX_CODE_LINE_SIZE]  = { '\0' };
 
+    //创建对应目录
+    if (Create_Project_Path(OBJECT_OUTPUT_PATH) == false)
+    {
+        return false;
+    }
+
     sprintf(szHFileName, "%s//%s.h", OBJECT_OUTPUT_PATH, objObjectClassList[nIndex].m_strClassName.c_str());
     FILE* pFile = fopen(szHFileName, "w");
 
@@ -240,6 +246,12 @@ bool CReadObject::Create_Object_Cpp(int nIndex, vec_ObjectClass objObjectClassLi
 {
     char szHFileName[200] = { '\0' };
     char szCodeLine[MAX_CODE_LINE_SIZE] = { '\0' };
+
+    //创建对应目录
+    if (Create_Project_Path(OBJECT_OUTPUT_PATH) == false)
+    {
+        return false;
+    }
 
     sprintf(szHFileName, "%s//%s.cpp", OBJECT_OUTPUT_PATH, objObjectClassList[nIndex].m_strClassName.c_str());
     FILE* pFile = fopen(szHFileName, "w");
@@ -569,6 +581,12 @@ bool CReadObject::Create_Message_H(_Message_Info objMessageInfo, _Base_Type_List
     char szHFileName[200] = { '\0' };
     char szCodeLine[MAX_CODE_LINE_SIZE] = { '\0' };
 
+    //创建对应目录
+    if (Create_Project_Path(MESSAGE_OUTPUT_PATH) == false)
+    {
+        return false;
+    }
+
     sprintf(szHFileName, "%s//%s.h", MESSAGE_OUTPUT_PATH, objMessageInfo.m_strMessageName.c_str());
     FILE* pFile = fopen(szHFileName, "w");
 
@@ -622,6 +640,12 @@ bool CReadObject::Create_Function_H(_Function_Info& obj_Function_Info)
 {
     char szHFileName[200] = { '\0' };
     char szCodeLine[MAX_CODE_LINE_SIZE] = { '\0' };
+
+    //创建对应目录
+    if (Create_Project_Path(FUNCTION_OUTPUT_PATH) == false)
+    {
+        return false;
+    }
 
     sprintf(szHFileName, "%s//%s.h", FUNCTION_OUTPUT_PATH, obj_Function_Info.m_strFunctionName.c_str());
     FILE* pFile = fopen(szHFileName, "w");
@@ -705,6 +729,12 @@ bool CReadObject::Create_Function_Cpp(_Function_Info& obj_Function_Info)
 {
     char szHFileName[200] = { '\0' };
     char szCodeLine[MAX_CODE_LINE_SIZE] = { '\0' };
+
+    //创建对应目录
+    if (Create_Project_Path(FUNCTION_OUTPUT_PATH) == false)
+    {
+        return false;
+    }
 
     sprintf(szHFileName, "%s//%s.cpp", FUNCTION_OUTPUT_PATH, obj_Function_Info.m_strFunctionName.c_str());
     FILE* pFile = fopen(szHFileName, "w");
@@ -790,6 +820,12 @@ bool CReadObject::Create_List_Manager_H(vec_ObjectClass objObjectClassList, vec_
     char szHFileName[200] = { '\0' };
     char szCodeLine[MAX_CODE_LINE_SIZE] = { '\0' };
 
+    //创建对应目录
+    if (Create_Project_Path(OBJECT_OUTPUT_PATH) == false)
+    {
+        return false;
+    }
+
     sprintf(szHFileName, "%s//%s.h", OBJECT_OUTPUT_PATH, OBJECT_LIST_MANAGER_NAME);
     FILE* pFile = fopen(szHFileName, "w");
 
@@ -860,6 +896,12 @@ bool CReadObject::Create_List_Manager_Cpp(vec_ObjectClass objObjectClassList, ve
     //创建对象管理类
     char szHFileName[200] = { '\0' };
     char szCodeLine[MAX_CODE_LINE_SIZE] = { '\0' };
+
+    //创建对应目录
+    if (Create_Project_Path(OBJECT_OUTPUT_PATH) == false)
+    {
+        return false;
+    }
 
     sprintf(szHFileName, "%s//%s.cpp", OBJECT_OUTPUT_PATH, OBJECT_LIST_MANAGER_NAME);
     FILE* pFile = fopen(szHFileName, "w");

@@ -625,6 +625,7 @@ int main()
     //开始生成文件
     CReadObject objReadObject;
 
+    //生成对应类结构文件
     for (int i = 0; i < (int)obj_vec_ObjectClass.size(); i++)
     {
         objReadObject.WriteClass(i, obj_vec_ObjectClass, obj_Base_Type_List_info);
