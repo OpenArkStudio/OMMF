@@ -304,12 +304,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ECSObject\System.h" />
-    <ClInclude Include="..\OMMFObject\TemplateObjectList.h" />
     <ClInclude Include=".\ReadObject.h" />
     <ClInclude Include=".\TinyXML\tinystr.h" />
     <ClInclude Include=".\TinyXML\tinyxml.h" />
     <ClInclude Include=".\XmlOpeation.h" />
     <ClInclude Include="Common.h" />
+    <ClInclude Include="TemplateObjectList.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ECSTools.mpc">

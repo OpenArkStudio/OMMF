@@ -116,6 +116,43 @@ struct _Base_Type_List_info
     }
 };
 
+//拷贝文件的实现
+static int copyFile(const char* src, const char* des)
+{
+    int nRet = 0;
+    FILE* pSrc = NULL, *pDes = NULL;
+    pSrc = fopen(src, "r");
+    pDes = fopen(des, "w+");
+
+    if (pSrc && pDes)
+    {
+        int nLen = 0;
+        char szBuf[1024] = { 0 };
+
+        while ((nLen = fread(szBuf, 1, sizeof szBuf, pSrc)) > 0)
+        {
+            fwrite(szBuf, 1, nLen, pDes);
+        }
+    }
+    else
+    {
+        nRet = -1;
+    }
+
+    if (pSrc)
+    {
+        fclose(pSrc), pSrc = NULL;
+    }
+
+    if (pDes)
+    {
+        fclose(pDes), pDes = NULL;
+    }
+
+    return nRet;
+}
+
+
 //查看指定目录是否存在，不存在则创建之
 static bool Create_Project_Path(const char* pPath)
 {

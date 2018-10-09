@@ -631,11 +631,22 @@ int main()
         objReadObject.WriteClass(i, obj_vec_ObjectClass, obj_Base_Type_List_info);
     }
 
+    //将TemplateObjectList.h拷贝到OBJECT_OUTPUT_PATH路径下
+    char szSrcTemplateFile[MAX_CODE_LINE_SIZE] = { '\0' };
+    char szDesTemplateFile[MAX_CODE_LINE_SIZE] = { '\0' };
+
+    sprintf_safe(szSrcTemplateFile, MAX_CODE_LINE_SIZE, "./TemplateObjectList.h");
+    sprintf_safe(szDesTemplateFile, MAX_CODE_LINE_SIZE, "%s/TemplateObjectList.h", OBJECT_OUTPUT_PATH);
+
+    copyFile(szSrcTemplateFile, szDesTemplateFile);
+
+    //生成消息文件
     for (int i = 0; i < (int)obj_vec_Message_Info.size(); i++)
     {
         objReadObject.WriteMessage(obj_vec_Message_Info[i], obj_Base_Type_List_info);
     }
 
+    //生成函数入口文件
     for (int i = 0; i < (int)obj_vec_Function_Info.size(); i++)
     {
         objReadObject.WriteFunction(obj_vec_Function_Info[i]);
