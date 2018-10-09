@@ -1049,7 +1049,7 @@ bool CReadObject::Create_Test_Manager_Cpp(vec_ObjectClass objObjectClassList, ve
     sprintf(szHFileName, "%s//%s.cpp", OBJECT_TEST_PATH, OBJECT_TEST_FILENAME);
     FILE* pFile = fopen(szHFileName, "w");
 
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#include \"ObjectManager.h\"\n\n", OBJECT_LIST_MANAGER_NAME);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "#include \"ProjectCode\\ObjectManager.h\"\n\n", OBJECT_LIST_MANAGER_NAME);
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
     //Ìí¼Ó²âÊÔº¯Êý
@@ -1241,12 +1241,12 @@ bool CReadObject::Create_Test_Make(vec_ObjectClass objObjectClassList, vec_Base_
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "default:all\n\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "PATS1 = TestManager.o ../OMMFObject/ObjectManager.o");
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "PATS1 = TestManager.o ../ProjectCode/OMMFObject/ObjectManager.o");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
     for (int i = 0; i < (int)objObjectClassList.size(); i++)
     {
-        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, " ../OMMFObject/%s.o",
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, " ../ProjectCode/OMMFObject/%s.o",
                      objObjectClassList[i].m_strClassName.c_str());
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     }
