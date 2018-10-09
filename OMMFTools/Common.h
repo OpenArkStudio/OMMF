@@ -25,13 +25,13 @@
 
 using namespace std;
 
-#define FUNCTION_CONFIG_PATH     "../Function"
-#define OBJECT_MESSAGE_PATH      "../ObjectMessage"
-#define OBJECT_CONFIG_PATH       "../ObjectConfig"
+#define FUNCTION_CONFIG_PATH     "../Conf/Function"
+#define OBJECT_MESSAGE_PATH      "../Conf/ObjectMessage"
+#define OBJECT_CONFIG_PATH       "../Conf/ObjectConfig"
 #define OBJECT_OUTPUT_PATH       "../ProjectCode/OMMFObject"
 #define MESSAGE_OUTPUT_PATH      "../ProjectCode/OMMFMessage"
 #define FUNCTION_OUTPUT_PATH     "../ProjectCode/OMMFFunction"
-#define OBJECT_BASETYPE_PATH     "../ObjectConfig/BaseType.xml"
+#define OBJECT_BASETYPE_PATH     "../Conf/ObjectConfig/BaseType.xml"
 #define OBJECT_BASETYPE_FILE     "BaseType.h"
 #define OBJECT_BASECLASS_FILE    "BaseObject.h"
 #define OBJECT_LIST_MANAGER_NAME "ObjectManager"
