@@ -308,6 +308,7 @@
     <ClInclude Include=".\TinyXML\tinystr.h" />
     <ClInclude Include=".\TinyXML\tinyxml.h" />
     <ClInclude Include=".\XmlOpeation.h" />
+    <ClInclude Include="BaseObject.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="TemplateObjectList.h" />
   </ItemGroup>

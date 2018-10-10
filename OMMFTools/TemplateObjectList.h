@@ -61,12 +61,14 @@ static int Get_Object_UID_Info(char* pObjectUID, int nLen, int& nType, int& nPos
     return 0;
 }
 
-struct _Object_Data_Info
+//对应对象的槽位
+struct _Object_Data_Solt
 {
-    IObject*  m_pObject;       //指针对象
-    int       m_nState;       //当前指针状态，0：不可用，1未使用，2正在使用
+    IObject*  m_pObject;            //指针对象
+    int       m_nState;             //当前指针状态，0：不可用，1未使用，2正在使用
+    char      m_szUUID[GUID_SIZE];  //当前对象的唯一ID
 
-    _Object_Data_Info()
+    _Object_Data_Solt()
     {
         Init();
     }
@@ -75,6 +77,18 @@ struct _Object_Data_Info
     {
         m_pObject              = NULL;
         m_nState               = 0;
+        m_szUUID[0]            = '\0';
+    }
+
+    void Set_UUID(const char* pUUID)
+    {
+        sprintf(m_szUUID, "%s", pUUID);
+    }
+
+    void Clear()
+    {
+        m_nState = 1;
+        m_szUUID[0] = '\0';
     }
 };
 
@@ -110,7 +124,7 @@ public:
         m_nType    = nType;
         m_nCount   = nCount;
 
-        m_objectList = new _Object_Data_Info[nCount];
+        m_objectList = new _Object_Data_Solt[nCount];
 
         for (int i = 0; i < m_nCount; i++)
         {
@@ -135,6 +149,7 @@ public:
                 m_objectList[i].m_nState = 2; //标记位正在使用
                 m_nCurrIndex = i;
                 Create_Object_UID_Fn(pObjectUID, nLen, m_nType, i);
+                m_objectList[i].Set_UUID(pObjectUID);   //在槽位记录当前的UUID
                 return (T*)m_objectList[i].m_pObject;
             }
         }
@@ -146,6 +161,8 @@ public:
             {
                 m_objectList[i].m_nState = 2; //标记位正在使用
                 m_nCurrIndex = i;
+                Create_Object_UID_Fn(pObjectUID, nLen, m_nType, i);
+                m_objectList[i].Set_UUID(pObjectUID);   //在槽位记录当前的UUID
                 return (T*)m_objectList[i].m_pObject;
             }
         }
@@ -176,7 +193,7 @@ public:
             }
 
             //回收对象
-            m_objectList[nPos].m_nState = 1; //标记为未使用
+            m_objectList[nPos].Clear();
             return true;
         }
         else
@@ -228,7 +245,7 @@ private:
     int                m_nCount;          //当前缓冲数组对象的个数
     int                m_nUsedCount;      //当前正在使用对象的个数
     int                m_nCurrIndex;      //当前指针，用于Create使用
-    _Object_Data_Info* m_objectList;      //对象指针数组
+    _Object_Data_Solt* m_objectList;      //对象指针数组
 };
 
 #endif
