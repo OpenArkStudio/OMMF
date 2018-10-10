@@ -4,6 +4,8 @@
 #include "BaseObject.h"
 #include <time.h>
 
+#include <vector>
+using namespace std;
 
 #define GUID_SIZE 24
 
@@ -235,6 +237,20 @@ public:
     int Get_Count()
     {
         return m_nCount;
+    }
+
+    //得到当前的所有使用对象的列表
+    void Get_All_Used_Object_List(vector<_Object_Data_Solt*> vecObjectList)
+    {
+        vecObjectList->clear();
+
+        for (int i = 0; i < m_nCount; i++)
+        {
+            if (m_objectList[i].m_nState == 2)
+            {
+                vecObjectList.push_back(&m_objectList[i]);
+            }
+        }
     }
 
 private:
