@@ -27,11 +27,13 @@ using namespace std;
 
 #define FUNCTION_CONFIG_PATH     "../Conf/Function"
 #define OBJECT_MESSAGE_PATH      "../Conf/ObjectMessage"
-#define OBJECT_CONFIG_PATH       "../Conf/ObjectConfig"
+#define OBJECT_CONFIG_PATH       "../Conf/ObjectConf"
+#define MYSQL_CONFIG_PATH        "../Conf/MysqlConf/Mysql.xml"
 #define OBJECT_OUTPUT_PATH       "../ProjectCode/OMMFObject"
 #define MESSAGE_OUTPUT_PATH      "../ProjectCode/OMMFMessage"
 #define FUNCTION_OUTPUT_PATH     "../ProjectCode/OMMFFunction"
-#define OBJECT_BASETYPE_PATH     "../Conf/ObjectConfig/BaseType.xml"
+#define MYSQL_OUTPUT_PATH        "../ProjectCode/MysqlCode"
+#define OBJECT_BASETYPE_PATH     "../Conf/ObjectConf/BaseType.xml"
 #define OBJECT_BASETYPE_FILE     "BaseType.h"
 #define OBJECT_BASECLASS_FILE    "BaseObject.h"
 #define OBJECT_LIST_MANAGER_NAME "ObjectManager"
@@ -117,6 +119,22 @@ struct _Base_Type_List_info
         m_nKeyPos = -1;
     }
 };
+
+//Mysql数据结构
+struct _Xml_Mysql_Table
+{
+    int    m_nClassID;                    //object类对象的唯一ID
+};
+
+typedef vector<_Xml_Mysql_Table> vec_Xml_Mysql_Table;
+
+//Mysql数据结构
+struct _Xml_Mysql_DB
+{
+    string m_strDBName;
+    vec_Xml_Mysql_Table m_vec_Xml_Mysql_Table;  //可以有多个DB
+};
+typedef vector<_Xml_Mysql_DB> vec_Xml_Mysql_DB;
 
 //拷贝文件的实现
 static int copyFile(const char* src, const char* des)

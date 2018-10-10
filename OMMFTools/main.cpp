@@ -155,6 +155,68 @@ bool Read_Xml_Folder(string folderPath, vec_Xml_File_Name& obj_vec_Xml_File_Name
     return true;
 }
 
+//读取mysql配置信息，并转换为数据结构
+bool Read_Mysql_XML_File(vec_Xml_Mysql_DB& obj_vec_Xml_Mysql_DB)
+{
+    CXmlOpeation obj_MainConfig;
+
+    obj_vec_Xml_Mysql_DB.clear();
+
+    TiXmlDocument* m_pTiXmlDocument = new TiXmlDocument(MYSQL_CONFIG_PATH);
+
+    if (NULL == m_pTiXmlDocument)
+    {
+        return false;
+    }
+
+    if (false == m_pTiXmlDocument->LoadFile())
+    {
+        return false;
+    }
+
+    //获得根元素
+    TiXmlElement* m_pRootElement = m_pTiXmlDocument->RootElement();
+
+    if (NULL == m_pRootElement)
+    {
+        return false;
+    }
+
+    TiXmlNode* pMainNode = NULL;
+    TiXmlNode* pMysqlNode = NULL;
+
+    for (pMainNode = m_pRootElement->FirstChildElement(); pMainNode; pMainNode = pMainNode->NextSiblingElement())
+    {
+        char* pData = NULL;
+
+        _Xml_Mysql_DB obj_Xml_Mysql_DB;
+
+        //获得Lua文件信息
+        int nMainType = pMainNode->Type();
+
+        if (nMainType != TiXmlText::TINYXML_ELEMENT)
+        {
+            continue;
+        }
+
+        TiXmlElement* pMainElement = pMainNode->ToElement();
+        obj_Xml_Mysql_DB.m_strDBName = (string)pMainElement->Attribute("DBName");
+
+        //遍历下一级的函数信息
+        for (pMysqlNode = pMainElement->FirstChildElement(); pMysqlNode; pMysqlNode = pMysqlNode->NextSiblingElement())
+        {
+            _Xml_Mysql_Table obj_Xml_Mysql_Table;
+            TiXmlElement* pMysqlElement = pMysqlNode->ToElement();
+            obj_Xml_Mysql_Table.m_nClassID = atoi(pMysqlElement->Attribute("ClassID"));
+            obj_Xml_Mysql_DB.m_vec_Xml_Mysql_Table.push_back(obj_Xml_Mysql_Table);
+        }
+
+        obj_vec_Xml_Mysql_DB.push_back(obj_Xml_Mysql_DB);
+    }
+
+    return true;
+}
+
 //读取基本类型声明表
 bool Read_Base_Type_XML_File(_Base_Type_List_info& obj_Base_Type_List_info)
 {
@@ -538,6 +600,7 @@ int main()
     vec_ObjectClass      obj_vec_ObjectClass;
     vec_Message_Info     obj_vec_Message_Info;
     vec_Function_Info    obj_vec_Function_Info;
+    vec_Xml_Mysql_DB     obj_vec_Xml_Mysql_DB;
 
     SetAppPath();
 
@@ -612,6 +675,9 @@ int main()
         printf("[Main]Read_Function_File is fail.\n");
         return 0;
     }
+
+    //将所有的MysqlXML转化为vec_Xml_Mysql_DB数据结构
+    Read_Mysql_XML_File(obj_vec_Xml_Mysql_DB);
 
     //创建公共头文件
     if(false == Create_Base_Type_H(obj_Base_Type_List_info.m_vec_Base_Type_List))
