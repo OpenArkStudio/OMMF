@@ -240,7 +240,7 @@ public:
     }
 
     //得到当前的所有使用对象的列表
-    void Get_All_Used_Object_List(vector<_Object_Data_Solt*> vecObjectList)
+    void Get_All_Used_Object_List(vector<_Object_Data_Solt*>& vecObjectList)
     {
         vecObjectList->clear();
 
