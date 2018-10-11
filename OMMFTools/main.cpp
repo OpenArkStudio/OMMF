@@ -1,4 +1,5 @@
 #include "ReadObject.h"
+#include "MysqlObject.h"
 
 #ifdef _WIN32
 #include <io.h>
@@ -720,6 +721,10 @@ int main()
 
     objReadObject.WriteListManager(obj_vec_ObjectClass, obj_Base_Type_List_info);
     objReadObject.WriteTestManager(obj_vec_ObjectClass, obj_Base_Type_List_info);
+
+    //生成需要使用的mysql代码
+    CMysqlObject objMysqlObject;
+    objMysqlObject.WriteMysqlCode(obj_vec_Xml_Mysql_DB, obj_vec_ObjectClass, obj_Base_Type_List_info);
 
 #ifdef WIN32
     getchar();
