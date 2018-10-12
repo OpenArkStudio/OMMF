@@ -129,9 +129,9 @@ bool CMysqlObject::Create_Mysql_Code_Cpp(vec_Xml_Mysql_DB objMysqlDBList, vec_Ob
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
                 sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tchar szSQL[1024] = { '\0' };\n");
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tchar szSQL[1024] = { '\\0' };\n");
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tsprintf(szSQL, \"select ");
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tsprintf(szSQL, \"select GUID, ");
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
                 for (int i = 0; i < (int)pObjectClass->m_vec_Object_Info.size(); i++)
@@ -170,9 +170,51 @@ bool CMysqlObject::Create_Mysql_Code_Cpp(vec_Xml_Mysql_DB objMysqlDBList, vec_Ob
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
                 sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t{\n");
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\t_Object_Data_Solt* pSolt = new _Object_Data_Solt();\n");
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tC%s* p%s = new C%s();\n",
+                             pObjectClass->m_strClassName.c_str(),
+                             pObjectClass->m_strClassName.c_str(),
+                             pObjectClass->m_strClassName.c_str());
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tp%s->Init();\n",
+                             pObjectClass->m_strClassName.c_str());
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+                for (int k = 0; k < (int)pObjectClass->m_vec_Object_Info.size(); k++)
+                {
+                    if (pObjectClass->m_vec_Object_Info[k].m_strAttribute == "STRING")
+                    {
+                        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tp%s->Set_Data(\"%s\", record[%d]);\n",
+                                     pObjectClass->m_strClassName.c_str(),
+                                     pObjectClass->m_vec_Object_Info[k].m_strName.c_str(),
+                                     k + 1);
+                        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                    }
+                    else
+                    {
+                        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tp%s->Set_Data(\"%s\", atoi(record[%d]));\n",
+                                     pObjectClass->m_strClassName.c_str(),
+                                     pObjectClass->m_vec_Object_Info[k].m_strName.c_str(),
+                                     k + 1);
+                        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                    }
+                }
+
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tsprintf(pSolt->m_szUUID, \"%%s\", record[0]);\n");
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tpSolt->m_pObject = (IObject* )p%s;\n",
+                             pObjectClass->m_strClassName.c_str());
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tpSolt->m_nState = 2;\n");
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tvecObjectList.push_back(pSolt);\n");
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
                 sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n");
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
                 sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\treturn 0;\n");
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tmysql_free_result(results);;\n");
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
                 sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);

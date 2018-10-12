@@ -57,6 +57,7 @@ struct _Object_Info
     string m_strType;            //当前变量类型
     string m_strMin;             //当前变量最小值
     string m_strMax;             //当前变量最大值
+    string m_strAttribute;       //当前变量的类型，为整合数据库输出，目前支持 STRING NUMBER
     string m_strInit;            //当前变量初始值
 };
 

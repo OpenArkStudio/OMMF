@@ -334,11 +334,12 @@ bool Read_Message_File(vec_Xml_File_Name& obj_vec_Xml_Message_Name, vec_Message_
         char* pData = NULL;
         obj_Message_Info.m_strMessageName = Get_File_From_Path(obj_vec_Xml_Message_Name[i]);
 
-        TiXmlElement* pNextTiXmlElementName = NULL;
-        TiXmlElement* pNextTiXmlElementType = NULL;
-        TiXmlElement* pNextTiXmlElementMin = NULL;
-        TiXmlElement* pNextTiXmlElementMax = NULL;
-        TiXmlElement* pNextTiXmlElementInit = NULL;
+        TiXmlElement* pNextTiXmlElementName      = NULL;
+        TiXmlElement* pNextTiXmlElementType      = NULL;
+        TiXmlElement* pNextTiXmlElementMin       = NULL;
+        TiXmlElement* pNextTiXmlElementMax       = NULL;
+        TiXmlElement* pNextTiXmlElementAttribute = NULL;
+        TiXmlElement* pNextTiXmlElementInit      = NULL;
 
         while (true)
         {
@@ -385,6 +386,17 @@ bool Read_Message_File(vec_Xml_File_Name& obj_vec_Xml_Message_Name, vec_Message_
             else
             {
                 obj_Object_Info.m_strMax = "";
+            }
+
+            pData = obj_MainConfig.GetData("CObject", "attribute", pNextTiXmlElementAttribute);
+
+            if (pData != NULL)
+            {
+                obj_Object_Info.m_strAttribute = (string)pData;
+            }
+            else
+            {
+                obj_Object_Info.m_strAttribute = "STRING";
             }
 
             pData = obj_MainConfig.GetData("CObject", "init", pNextTiXmlElementInit);
@@ -517,11 +529,12 @@ bool Read_XML_File(vec_Xml_File_Name& obj_vec_Xml_File_Name, vec_ObjectClass& ob
             return false;
         }
 
-        TiXmlElement* pNextTiXmlElementName = NULL;
-        TiXmlElement* pNextTiXmlElementType = NULL;
-        TiXmlElement* pNextTiXmlElementMin  = NULL;
-        TiXmlElement* pNextTiXmlElementMax  = NULL;
-        TiXmlElement* pNextTiXmlElementInit = NULL;
+        TiXmlElement* pNextTiXmlElementName      = NULL;
+        TiXmlElement* pNextTiXmlElementType      = NULL;
+        TiXmlElement* pNextTiXmlElementMin       = NULL;
+        TiXmlElement* pNextTiXmlElementMax       = NULL;
+        TiXmlElement* pNextTiXmlElementInit      = NULL;
+        TiXmlElement* pNextTiXmlElementAttribute = NULL;
 
         while (true)
         {
@@ -568,6 +581,17 @@ bool Read_XML_File(vec_Xml_File_Name& obj_vec_Xml_File_Name, vec_ObjectClass& ob
             else
             {
                 obj_Object_Info.m_strMax = "";
+            }
+
+            pData = obj_MainConfig.GetData("CObject", "attribute", pNextTiXmlElementAttribute);
+
+            if (pData != NULL)
+            {
+                obj_Object_Info.m_strAttribute = (string)pData;
+            }
+            else
+            {
+                obj_Object_Info.m_strAttribute = "STRING";
             }
 
             pData = obj_MainConfig.GetData("CObject", "init", pNextTiXmlElementInit);
