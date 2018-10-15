@@ -33,6 +33,7 @@ using namespace std;
 #define MESSAGE_OUTPUT_PATH      "../ProjectCode/OMMFMessage"
 #define FUNCTION_OUTPUT_PATH     "../ProjectCode/OMMFFunction"
 #define MYSQL_OUTPUT_PATH        "../ProjectCode/MysqlCode"
+#define MYSQL_OUTPUT_SCRIPT_PATH "../ProjectCode/MysqlScript"
 #define OBJECT_BASETYPE_PATH     "../Conf/ObjectConf/BaseType.xml"
 #define OBJECT_BASETYPE_FILE     "BaseType.h"
 #define OBJECT_BASECLASS_FILE    "BaseObject.h"
