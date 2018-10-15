@@ -234,11 +234,12 @@ bool Read_Base_Type_XML_File(_Base_Type_List_info& obj_Base_Type_List_info)
     //解析类相关参数信息
     char* pData = NULL;
 
-    TiXmlElement* pNextTiXmlElementName  = NULL;
-    TiXmlElement* pNextTiXmlElementType  = NULL;
-    TiXmlElement* pNextTiXmlElementClass = NULL;
-    TiXmlElement* pNextTiXmlElementSize  = NULL;
-    TiXmlElement* pNextTiXmlElementKey   = NULL;
+    TiXmlElement* pNextTiXmlElementName     = NULL;
+    TiXmlElement* pNextTiXmlElementType     = NULL;
+    TiXmlElement* pNextTiXmlElementClass    = NULL;
+    TiXmlElement* pNextTiXmlElementSize     = NULL;
+    TiXmlElement* pNextTiXmlElementSaveSize = NULL;
+    TiXmlElement* pNextTiXmlElementKey      = NULL;
 
     while (true)
     {
@@ -281,6 +282,17 @@ bool Read_Base_Type_XML_File(_Base_Type_List_info& obj_Base_Type_List_info)
         if (pData != NULL)
         {
             obj_BaseType.m_nLen = atoi(pData);
+        }
+        else
+        {
+            break;
+        }
+
+        pData = obj_MainConfig.GetData("CObject", "savesize", pNextTiXmlElementSaveSize);
+
+        if (pData != NULL)
+        {
+            obj_BaseType.m_nSaveSize = atoi(pData);
         }
         else
         {

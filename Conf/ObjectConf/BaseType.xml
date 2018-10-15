@@ -1,10 +1,15 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- name 类名称 -->
+<!-- type 替换基类名称 -->
+<!-- Class 数组或者单一对象，single为单一对象，array为数组对象 -->
+<!-- size 对象所占空间字节数 -->
+<!-- SaveSize 对象在数据源中的存储大小 -->
 <config>
-	<CObject name="GUID" type="char" class="array" size="32" isobjectkey="yes" />
-	<CObject name="uint8" type="unsigned char" class="single" size="1"/>
-	<CObject name="uint16" type="unsigned short" class="single" size="2"/>
-	<CObject name="uint32" type="unsigned int" class="single" size="4" />
-	<CObject name="uint64" type="unsigned long" class="single" size="8" />
-	<CObject name="Phone" type="char" class="array" size="12" />
-	<CObject name="CarName" type="char" class="array" size="16" />
+	<CObject name="GUID" type="char" class="array" size="32" savesize="32" isobjectkey="yes" />
+	<CObject name="uint8" type="unsigned char" class="single" size="1" savesize="10" />
+	<CObject name="uint16" type="unsigned short" class="single" size="2" savesize="10" />
+	<CObject name="uint32" type="unsigned int" class="single" size="4" savesize="10" />
+	<CObject name="uint64" type="unsigned long" class="single" size="8" savesize="10" />
+	<CObject name="Phone" type="char" class="array" size="12" savesize="12" />
+	<CObject name="CarName" type="char" class="array" size="16" savesize="16" />
 </config>

@@ -100,11 +100,13 @@ struct _BaseType
     string m_strBaseTypeName;            //typedef定义的名字
     string m_strTypeName;                //typedef定义的原始数据类型
     string m_strClassName;               //是单个对象，还是数据对象
-    int    m_nLen;                       //对象总长度
+    int    m_nLen;                       //对象总长度(字节数)
+    int    m_nSaveSize;                  //对象在数据源中的大小
 
     _BaseType()
     {
-        m_nLen    = 0;
+        m_nLen      = 0;
+        m_nSaveSize = 0;
     }
 };
 

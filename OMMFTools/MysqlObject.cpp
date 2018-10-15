@@ -21,6 +21,11 @@ bool CMysqlObject::WriteMysqlCode(vec_Xml_Mysql_DB objMysqlDBList, vec_ObjectCla
         return false;
     }
 
+    if (false == Create_Mysql_Script(objMysqlDBList, objObjectList, obj_Base_Type_List_info))
+    {
+        return false;
+    }
+
     return true;
 }
 
@@ -38,6 +43,19 @@ _ObjectClass* CMysqlObject::Get_ObjectClass(int nClassID, vec_ObjectClass& objOb
     }
 
     return NULL;
+}
+
+int CMysqlObject::Get_Object_Size(string strName, _Base_Type_List_info obj_Base_Type_List_info)
+{
+    for (int i = 0; i < (int)obj_Base_Type_List_info.m_vec_Base_Type_List.size(); i++)
+    {
+        if (obj_Base_Type_List_info.m_vec_Base_Type_List[i].m_strBaseTypeName == strName)
+        {
+            return obj_Base_Type_List_info.m_vec_Base_Type_List[i].m_nSaveSize;
+        }
+    }
+
+    return 1;
 }
 
 bool CMysqlObject::Create_Mysql_Code_H(vec_Xml_Mysql_DB objMysqlDBList, vec_ObjectClass objObjectList, _Base_Type_List_info obj_Base_Type_List_info)
@@ -389,6 +407,67 @@ bool CMysqlObject::Create_Mysql_Code_Cpp(vec_Xml_Mysql_DB objMysqlDBList, vec_Ob
                 fclose(pFile);
             }
         }
+    }
+
+    return true;
+}
+
+bool CMysqlObject::Create_Mysql_Script(vec_Xml_Mysql_DB objMysqlDBList, vec_ObjectClass objObjectList, _Base_Type_List_info obj_Base_Type_List_info)
+{
+    char szHFileName[200] = { '\0' };
+    char szCodeLine[MAX_CODE_LINE_SIZE] = { '\0' };
+    _ObjectClass* pObjectClass = NULL;
+
+    //创建对应目录
+    if (Create_Project_Path(MYSQL_OUTPUT_SCRIPT_PATH) == false)
+    {
+        return false;
+    }
+
+    for (int i = 0; i < (int)objMysqlDBList.size(); i++)
+    {
+        sprintf_safe(szHFileName, 200, "%s/%s_DB.sql", MYSQL_OUTPUT_SCRIPT_PATH, objMysqlDBList[i].m_strDBName.c_str());
+        FILE* pFile = fopen(szHFileName, "w");
+
+        for (int j = 0; j < (int)objMysqlDBList[i].m_vec_Xml_Mysql_Table.size(); j++)
+        {
+            pObjectClass = NULL;
+            pObjectClass = Get_ObjectClass(objMysqlDBList[i].m_vec_Xml_Mysql_Table[j].m_nClassID, objObjectList);
+
+            if (NULL != pObjectClass)
+            {
+                //创建mysql表创建语句
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "CREATE TABLE IF NOT EXISTS `tb_%s`(\n",
+                             pObjectClass->m_strClassName.c_str());
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tGUID varchar(%d) primary key not null\n",
+                             GUID_SIZE);
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+                for (int k = 0; k < (int)pObjectClass->m_vec_Object_Info.size(); k++)
+                {
+                    if (pObjectClass->m_vec_Object_Info[k].m_strAttribute == "STRING")
+                    {
+                        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t%s varchar(%d)\n",
+                                     pObjectClass->m_vec_Object_Info[k].m_strName.c_str(),
+                                     Get_Object_Size(pObjectClass->m_vec_Object_Info[k].m_strType, obj_Base_Type_List_info));
+                        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                    }
+                    else
+                    {
+                        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t%s int(%d)\n",
+                                     pObjectClass->m_vec_Object_Info[k].m_strName.c_str(),
+                                     Get_Object_Size(pObjectClass->m_vec_Object_Info[k].m_strType, obj_Base_Type_List_info));
+                        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                    }
+                }
+
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t);\n");
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+            }
+        }
+
+        fclose(pFile);
     }
 
     return true;
