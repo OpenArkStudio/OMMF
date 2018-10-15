@@ -106,7 +106,7 @@ struct _BaseType
     _BaseType()
     {
         m_nLen      = 0;
-        m_nSaveSize = 0;
+        m_nSaveSize = 1;
     }
 };
 

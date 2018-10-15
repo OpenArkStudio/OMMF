@@ -294,10 +294,6 @@ bool Read_Base_Type_XML_File(_Base_Type_List_info& obj_Base_Type_List_info)
         {
             obj_BaseType.m_nSaveSize = atoi(pData);
         }
-        else
-        {
-            break;
-        }
 
         pData = obj_MainConfig.GetData("CObject", "isobjectkey", pNextTiXmlElementKey);
 
