@@ -174,7 +174,6 @@ bool CReadObject::Create_Object_H(int nIndex, vec_ObjectClass objObjectClassList
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t~C%s();\n", objObjectClassList[nIndex].m_strClassName.c_str());
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tvoid Load_Param();\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tint Get_Class_ID();\n");
@@ -201,6 +200,25 @@ bool CReadObject::Create_Object_H(int nIndex, vec_ObjectClass objObjectClassList
             fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
         }
     }
+
+    //添加重载等于的方法
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t%s& operator = (const %s& ar)\n",
+                 objObjectClassList[nIndex].m_strClassName.c_str(),
+                 objObjectClassList[nIndex].m_strClassName.c_str());
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t{\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    for (int j = 0; j < (int)objObjectClassList[nIndex].m_vec_Object_Info.size(); j++)
+    {
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tthis->Set_Data(\"%s\", ar.Get_Data(\"%s\");\n",
+                     objObjectClassList[nIndex].m_vec_Object_Info[j].m_strName.c_str(),
+                     objObjectClassList[nIndex].m_vec_Object_Info[j].m_strName.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
     //创建Get_Stream方法
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tbool Get_Stream(char* pData, int& nLen);\n");

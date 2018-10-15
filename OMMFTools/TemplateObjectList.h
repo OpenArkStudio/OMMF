@@ -253,6 +253,12 @@ public:
         }
     }
 
+    //写入当前类使用者
+    void Set_Object_List(vector<_Object_Data_Solt*>& vecObjectList)
+    {
+
+    }
+
 private:
     int (*Create_Object_UID_Fn)(char* pObjectUID, int& nLen, int nType, int nPos);               //创建对象UID的消息函数指针
     int (*Get_Object_UID_Info_Fn)(char* pObjectUID, int nLen, int& nType, int& nPos);       //获得指定对象UID分类函数指针
