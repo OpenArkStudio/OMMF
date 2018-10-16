@@ -275,11 +275,11 @@ public:
             int nType = 0;
             int nPos  = 0;
 
-            if (0 == Get_Object_UID_Info_Fn(vecObjectList[i].m_szUUID, GUID_SIZE, nType, nPos))
+            if (0 == Get_Object_UID_Info_Fn(vecObjectList[i]->m_szUUID, GUID_SIZE, nType, nPos))
             {
                 if (nType == m_nType)
                 {
-                    (T*)m_objectList[nPos].m_pObject = (T*)vecObjectList[i].m_pObject;
+                    (T*)m_objectList[nPos].m_pObject = (T*)vecObjectList[i]->m_pObject;
                 }
             }
         }
