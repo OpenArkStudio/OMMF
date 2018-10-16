@@ -279,7 +279,7 @@ public:
             {
                 if (nType == m_nType)
                 {
-                    (T*)m_objectList[nPos].m_pObject = (T*)vecObjectList[i]->m_pObject;
+                    (*(T*)m_objectList[nPos].m_pObject) = (*(T*)vecObjectList[i]->m_pObject);
                 }
             }
         }
