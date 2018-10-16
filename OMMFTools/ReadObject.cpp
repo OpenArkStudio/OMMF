@@ -202,7 +202,7 @@ bool CReadObject::Create_Object_H(int nIndex, vec_ObjectClass objObjectClassList
     }
 
     //添加重载等于的方法
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t%s& operator = (const %s& ar)\n",
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tC%s& operator = (const C%s& ar)\n",
                  objObjectClassList[nIndex].m_strClassName.c_str(),
                  objObjectClassList[nIndex].m_strClassName.c_str());
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
