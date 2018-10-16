@@ -211,7 +211,15 @@ bool CReadObject::Create_Object_H(int nIndex, vec_ObjectClass objObjectClassList
 
     for (int j = 0; j < (int)objObjectClassList[nIndex].m_vec_Object_Info.size(); j++)
     {
-        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tthis->Set_Data(\"%s\", ar.Get_Data(\"%s\");\n",
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\t%s obj%s;\n",
+                     objObjectClassList[nIndex].m_vec_Object_Info[j].m_strType.c_str(),
+                     objObjectClassList[nIndex].m_vec_Object_Info[j].m_strName.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tar.Get_Data(\"%s\", obj%s);\n",
+                     objObjectClassList[nIndex].m_vec_Object_Info[j].m_strName.c_str(),
+                     objObjectClassList[nIndex].m_vec_Object_Info[j].m_strName.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tthis->Set_Data(\"%s\", obj%s);\n",
                      objObjectClassList[nIndex].m_vec_Object_Info[j].m_strName.c_str(),
                      objObjectClassList[nIndex].m_vec_Object_Info[j].m_strName.c_str());
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
