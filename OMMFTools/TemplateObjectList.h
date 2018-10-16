@@ -75,11 +75,25 @@ struct _Object_Data_Solt
         Init();
     }
 
+    ~_Object_Data_Solt()
+    {
+        Close();
+    }
+
     void Init()
     {
         m_pObject              = NULL;
         m_nState               = 0;
         m_szUUID[0]            = '\0';
+    }
+
+    void Close()
+    {
+        if (NULL != m_pObject)
+        {
+            delete m_pObject;
+            m_pObject = NULL;
+        }
     }
 
     void Set_UUID(const char* pUUID)
@@ -242,7 +256,7 @@ public:
     //得到当前的所有使用对象的列表
     void Get_All_Used_Object_List(vector<_Object_Data_Solt*>& vecObjectList)
     {
-        vecObjectList->clear();
+        vecObjectList.clear();
 
         for (int i = 0; i < m_nCount; i++)
         {
@@ -256,7 +270,19 @@ public:
     //写入当前类使用者
     void Set_Object_List(vector<_Object_Data_Solt*>& vecObjectList)
     {
+        for (int i = 0; i < (int)vecObjectList.size(); i++)
+        {
+            int nType = 0;
+            int nPos  = 0;
 
+            if (0 == Get_Object_UID_Info_Fn(vecObjectList[i].m_szUUID, GUID_SIZE, nType, nPos))
+            {
+                if (nType == m_nType)
+                {
+                    (T*)m_objectList[nPos].m_pObject = (T*)vecObjectList[i].m_pObject;
+                }
+            }
+        }
     }
 
 private:
