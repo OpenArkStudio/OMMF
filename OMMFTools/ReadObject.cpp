@@ -196,7 +196,7 @@ bool CReadObject::Create_Object_H(int nIndex, vec_ObjectClass objObjectClassList
     {
         if (true == Check_Type_In_Class(obj_Base_Type_List_info.m_vec_Base_Type_List[j].m_strBaseTypeName, objObjectClassList[nIndex].m_vec_Object_Info))
         {
-            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tint Get_Data(string strValueName, %s& Value);\n", obj_Base_Type_List_info.m_vec_Base_Type_List[j].m_strBaseTypeName.c_str());
+            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tint Get_Data(string strValueName, %s& Value) const;\n", obj_Base_Type_List_info.m_vec_Base_Type_List[j].m_strBaseTypeName.c_str());
             fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
         }
     }
@@ -495,7 +495,7 @@ bool CReadObject::Create_Object_Cpp(int nIndex, vec_ObjectClass objObjectClassLi
     {
         if (true == Check_Type_In_Class(obj_Base_Type_List_info.m_vec_Base_Type_List[i].m_strBaseTypeName, objObjectClassList[nIndex].m_vec_Object_Info))
         {
-            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "int C%s::Get_Data(string strValueName, %s& Value)\n",
+            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "int C%s::Get_Data(string strValueName, %s& Value) const\n",
                          objObjectClassList[nIndex].m_strClassName.c_str(),
                          obj_Base_Type_List_info.m_vec_Base_Type_List[i].m_strBaseTypeName.c_str());
             fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
