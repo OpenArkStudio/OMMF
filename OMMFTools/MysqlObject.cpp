@@ -219,6 +219,10 @@ bool CMysqlObject::Create_Mysql_Code_Cpp(vec_Xml_Mysql_DB objMysqlDBList, vec_Ob
                     }
                 }
 
+                sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tp%s->Set_Data(\"%s\", record[0]);\n",
+                             pObjectClass->m_strClassName.c_str(),
+                             pObjectClass->m_strClassName.c_str());
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
                 sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tsprintf(pSolt->m_szUUID, \"%%s\", record[0]);\n");
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
                 sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tpSolt->m_pObject = (IObject* )p%s;\n",

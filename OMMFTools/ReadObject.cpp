@@ -345,9 +345,9 @@ bool CReadObject::Create_Object_Cpp(int nIndex, vec_ObjectClass objObjectClassLi
             sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t%s obj%s;\n", objObjectClassList[nIndex].m_vec_Object_Info[i].m_strType.c_str(),
                          objObjectClassList[nIndex].m_vec_Object_Info[i].m_strName.c_str());
             fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tmemcpy(&obj%s, (char* )\"%s\", %d);\n", objObjectClassList[nIndex].m_vec_Object_Info[i].m_strName.c_str(),
+            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tmemcpy(&obj%s, (char* )\"%s\", strlen(\"%s\"));\n", objObjectClassList[nIndex].m_vec_Object_Info[i].m_strName.c_str(),
                          objObjectClassList[nIndex].m_vec_Object_Info[i].m_strInit.c_str(),
-                         nSize);
+                         objObjectClassList[nIndex].m_vec_Object_Info[i].m_strInit.c_str());
             fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
             sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tSet_Data(\"%s\", obj%s);\n", objObjectClassList[nIndex].m_vec_Object_Info[i].m_strName.c_str(),
                          objObjectClassList[nIndex].m_vec_Object_Info[i].m_strName.c_str());
