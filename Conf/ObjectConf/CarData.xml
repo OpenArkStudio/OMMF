@@ -5,5 +5,5 @@
 	<CObject name="Longitude" type="uint32" max="180" attribute="NUMBER" init="0" />
 	<CObject name="Latitude" type="uint32" max="180" attribute="NUMBER" init="0" />
 	<CObject name="Speed" type="uint16" max="200" attribute="NUMBER" init="10" />
-	<CObject name="CarType" type="GUID" attribute="STRING" />
+	<CObject name="CarType" type="GUID" attribute="STRING" init="None" />
 </config>

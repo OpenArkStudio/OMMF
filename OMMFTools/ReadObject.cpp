@@ -896,7 +896,7 @@ bool CReadObject::Create_List_Manager_H(vec_ObjectClass objObjectClassList, vec_
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tIObject* GetObject(char* szUID, int& nUIDSize);\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tbool GetObjectUseList(int nClassID);\n");
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tbool GetObjectUseList(int nClassID, vector<_Object_Data_Solt*>& vecObjectList);\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "private:\n", OBJECT_LIST_MANAGER_NAME);
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
