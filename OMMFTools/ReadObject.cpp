@@ -1103,7 +1103,7 @@ bool CReadObject::Create_List_Manager_Cpp(vec_ObjectClass objObjectClassList, ve
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
     //添加Set一组对象方法
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "bool C%s::SetObjectUseList(int nClassID, vector<_Object_Data_Solt*>& vecObjectList);\n", OBJECT_LIST_MANAGER_NAME);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "bool C%s::SetObjectUseList(int nClassID, vector<_Object_Data_Solt*>& vecObjectList)\n", OBJECT_LIST_MANAGER_NAME);
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
