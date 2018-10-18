@@ -898,6 +898,8 @@ bool CReadObject::Create_List_Manager_H(vec_ObjectClass objObjectClassList, vec_
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tbool GetObjectUseList(int nClassID, vector<_Object_Data_Solt*>& vecObjectList);\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tbool SetObjectUseList(int nClassID, vector<_Object_Data_Solt*>& vecObjectList);\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "private:\n", OBJECT_LIST_MANAGER_NAME);
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
@@ -1071,9 +1073,19 @@ bool CReadObject::Create_List_Manager_Cpp(vec_ObjectClass objObjectClassList, ve
 
     for (int i = 0; i < (int)objObjectClassList.size(); i++)
     {
-        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tif(nClassID == %d)\n",
-                     objObjectClassList[i].m_nClassID);
-        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        if (i == 0)
+        {
+            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tif(nClassID == %d)\n",
+                         objObjectClassList[i].m_nClassID);
+            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        }
+        else
+        {
+            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\telse if(nClassID == %d)\n",
+                         objObjectClassList[i].m_nClassID);
+            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        }
+
         sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t{\n");
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
         sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tm_obj%sList.Get_All_Used_Object_List(vecObjectList);\n",
@@ -1085,11 +1097,47 @@ bool CReadObject::Create_List_Manager_Cpp(vec_ObjectClass objObjectClassList, ve
         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     }
 
-    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "return false;\n");
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\treturn false;\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
     fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
+    //添加Set一组对象方法
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "bool C%s::SetObjectUseList(int nClassID, vector<_Object_Data_Solt*>& vecObjectList);\n", OBJECT_LIST_MANAGER_NAME);
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "{\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+    for (int i = 0; i < (int)objObjectClassList.size(); i++)
+    {
+        if (i == 0)
+        {
+            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tif(nClassID == %d)\n",
+                         objObjectClassList[i].m_nClassID);
+            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        }
+        else
+        {
+            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\telse if(nClassID == %d)\n",
+                         objObjectClassList[i].m_nClassID);
+            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        }
+
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t{\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tm_obj%sList.Set_Object_List(vecObjectList);\n",
+                     objObjectClassList[i].m_strClassName.c_str());
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\treturn true;\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n");
+        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    }
+
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\treturn false;\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "}\n\n");
+    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
     fclose(pFile);
     return true;
 }
