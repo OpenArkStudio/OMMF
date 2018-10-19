@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <config>
-	<DataBse DBName="CarDB">
+	<DataBase DBName="CarDB">
 		<MySQL ClassID="1001" />
-	</DataBse>
+	</DataBase>
 	
-	<DataBse DBName="CarTypeDB">
+	<DataBase DBName="CarTypeDB">
 		<MySQL ClassID="1000" />
-	</DataBse>	
+	</DataBase>	
 </config>
