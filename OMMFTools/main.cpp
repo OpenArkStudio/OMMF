@@ -85,7 +85,7 @@ bool Read_Xml_Folder(string folderPath, vec_Xml_File_Name& obj_vec_Xml_File_Name
 #ifdef WIN32
     _finddata_t FileInfo;
     string strfind = folderPath + "\\*";
-    int64_t Handle = _findfirst(strfind.c_str(), &FileInfo);
+    intptr_t  Handle = _findfirst(strfind.c_str(), &FileInfo);
 
     if (Handle == -1L)
     {

@@ -152,21 +152,26 @@ bool CMysqlObject::Create_Mysql_Code_Cpp(vec_Xml_Mysql_DB objMysqlDBList, vec_Ob
                 sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tsprintf(szSQL, \"select GUID, ");
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
+                //∆¥Ω”≤È—ØSQL”Ôæ‰
+                char szSQL[MAX_MYSQL_LINE_SIZE] = { '\0' };
+
                 for (int k = 0; k < (int)pObjectClass->m_vec_Object_Info.size(); k++)
                 {
-                    if (k != (int)pObjectClass->m_vec_Object_Info.size() - 1)
+                    if (pObjectClass->m_vec_Object_Info[k].m_strAttribute != "")
                     {
-                        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "%s, ", pObjectClass->m_vec_Object_Info[k].m_strName.c_str());
-                        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-                    }
-                    else
-                    {
-                        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "%s from tb_%s\");\n\n",
-                                     pObjectClass->m_vec_Object_Info[k].m_strName.c_str(),
-                                     pObjectClass->m_strClassName.c_str());
-                        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                        sprintf_safe(szSQL, MAX_MYSQL_LINE_SIZE, "%s%s, ", szSQL, pObjectClass->m_vec_Object_Info[k].m_strName.c_str());
                     }
                 }
+
+                if (szSQL[strlen(szSQL) - 2] == ',')
+                {
+                    szSQL[strlen(szSQL) - 2] = ' ';
+                }
+
+                sprintf_safe(szCodeLine, MAX_MYSQL_LINE_SIZE, "%s from tb_%s\");\n\n",
+                             szSQL,
+                             pObjectClass->m_strClassName.c_str());
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
                 sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\tint nRet = mysql_real_query(pConn, szSQL, strlen(szSQL));\n");
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
@@ -209,7 +214,7 @@ bool CMysqlObject::Create_Mysql_Code_Cpp(vec_Xml_Mysql_DB objMysqlDBList, vec_Ob
                                      k + 1);
                         fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
                     }
-                    else
+                    else if(pObjectClass->m_vec_Object_Info[k].m_strAttribute == "NUMBER")
                     {
                         sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tp%s->Set_Data(\"%s\", atoi(record[%d]));\n",
                                      pObjectClass->m_strClassName.c_str(),
@@ -259,136 +264,128 @@ bool CMysqlObject::Create_Mysql_Code_Cpp(vec_Xml_Mysql_DB objMysqlDBList, vec_Ob
 
                 for (int k = 0; k < (int)pObjectClass->m_vec_Object_Info.size(); k++)
                 {
-                    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\t%s obj%s;\n",
-                                 pObjectClass->m_vec_Object_Info[k].m_strType.c_str(),
-                                 pObjectClass->m_vec_Object_Info[k].m_strName.c_str());
-                    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-                    sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tp%s->Get_Data(\"%s\", obj%s);\n",
-                                 pObjectClass->m_strClassName.c_str(),
-                                 pObjectClass->m_vec_Object_Info[k].m_strName.c_str(),
-                                 pObjectClass->m_vec_Object_Info[k].m_strName.c_str());
-                    fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                    if (pObjectClass->m_vec_Object_Info[k].m_strAttribute != "")
+                    {
+                        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\t%s obj%s;\n",
+                                     pObjectClass->m_vec_Object_Info[k].m_strType.c_str(),
+                                     pObjectClass->m_vec_Object_Info[k].m_strName.c_str());
+                        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tp%s->Get_Data(\"%s\", obj%s);\n",
+                                     pObjectClass->m_strClassName.c_str(),
+                                     pObjectClass->m_vec_Object_Info[k].m_strName.c_str(),
+                                     pObjectClass->m_vec_Object_Info[k].m_strName.c_str());
+                        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+                    }
                 }
 
                 sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t\tsprintf(szSQL, \"insert into tb_%s(GUID, ", pObjectClass->m_strClassName.c_str());
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
+                szSQL[0] = '\0';
+
                 for (int k = 0; k < (int)pObjectClass->m_vec_Object_Info.size(); k++)
                 {
-                    if (k != (int)pObjectClass->m_vec_Object_Info.size() - 1)
-                    {
-                        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "%s, ", pObjectClass->m_vec_Object_Info[k].m_strName.c_str());
-                        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-                    }
-                    else
-                    {
-                        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "%s)\\\n \t\t\t(",
-                                     pObjectClass->m_vec_Object_Info[k].m_strName.c_str());
-                        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-                    }
+                    sprintf_safe(szSQL, MAX_MYSQL_LINE_SIZE, "%s%s, ",
+                                 szSQL,
+                                 pObjectClass->m_vec_Object_Info[k].m_strName.c_str());
                 }
+
+                if (szSQL[strlen(szSQL) - 2] == ',')
+                {
+                    szSQL[strlen(szSQL) - 2] = ' ';
+                }
+
+                sprintf_safe(szCodeLine, MAX_MYSQL_LINE_SIZE, "%s)\\\n \t\t\t(",
+                             szSQL);
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
                 sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "%%s, ");
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
-                for (int k = 0; k < (int)pObjectClass->m_vec_Object_Info.size(); k++)
-                {
-                    if (k != (int)pObjectClass->m_vec_Object_Info.size() - 1)
-                    {
-                        if (pObjectClass->m_vec_Object_Info[k].m_strAttribute == "STRING")
-                        {
-                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "%%s, ");
-                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-                        }
-                        else
-                        {
-                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "%%d, ");
-                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-                        }
-                    }
-                    else
-                    {
-                        if (pObjectClass->m_vec_Object_Info[k].m_strAttribute == "STRING")
-                        {
-                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "%%s) ON DUPLICATE KEY UPDATE\\\n \t\t\t");
-                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-                        }
-                        else
-                        {
-                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "%%d)ON DUPLICATE KEY UPDATE\\\n \t\t\t");
-                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-                        }
-                    }
-                }
+                szSQL[0] = '\0';
 
                 for (int k = 0; k < (int)pObjectClass->m_vec_Object_Info.size(); k++)
                 {
-                    if (k != (int)pObjectClass->m_vec_Object_Info.size() - 1)
+                    if (pObjectClass->m_vec_Object_Info[k].m_strAttribute == "STRING")
                     {
-                        if (pObjectClass->m_vec_Object_Info[k].m_strAttribute == "STRING")
-                        {
-                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "%s = '%%s', ",
-                                         pObjectClass->m_vec_Object_Info[k].m_strName.c_str());
-                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-                        }
-                        else
-                        {
-                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "%s = %%d, ",
-                                         pObjectClass->m_vec_Object_Info[k].m_strName.c_str());
-                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-                        }
+                        sprintf_safe(szSQL, MAX_MYSQL_LINE_SIZE, "%s%%s, ", szSQL);
+                    }
+                    else if(pObjectClass->m_vec_Object_Info[k].m_strAttribute == "NUMBER")
+                    {
+                        sprintf_safe(szSQL, MAX_MYSQL_LINE_SIZE, "%s%%d, ", szSQL);
+                    }
+
+                }
+
+                if (szSQL[strlen(szSQL) - 2] == ',')
+                {
+                    szSQL[strlen(szSQL) - 2] = ' ';
+                }
+
+                sprintf_safe(szCodeLine, MAX_MYSQL_LINE_SIZE, "%s)ON DUPLICATE KEY UPDATE\\\n \t\t\t", szSQL);
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+                szSQL[0] = '\0';
+
+                for (int k = 0; k < (int)pObjectClass->m_vec_Object_Info.size(); k++)
+                {
+                    if (pObjectClass->m_vec_Object_Info[k].m_strAttribute == "STRING")
+                    {
+                        sprintf_safe(szSQL, MAX_MYSQL_LINE_SIZE, "%s%s = '%%s', ",
+                                     szSQL,
+                                     pObjectClass->m_vec_Object_Info[k].m_strName.c_str());
                     }
                     else
                     {
-                        if (pObjectClass->m_vec_Object_Info[k].m_strAttribute == "STRING")
-                        {
-                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "%s = '%%s') \"\n \t\t\t",
-                                         pObjectClass->m_vec_Object_Info[k].m_strName.c_str());
-                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-                        }
-                        else
-                        {
-                            sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "%s = '%%d')\"\n \t\t\t",
-                                         pObjectClass->m_vec_Object_Info[k].m_strName.c_str());
-                            fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-                        }
+                        sprintf_safe(szSQL, MAX_MYSQL_LINE_SIZE, "%s%s = %%d, ",
+                                     szSQL,
+                                     pObjectClass->m_vec_Object_Info[k].m_strName.c_str());
                     }
                 }
+
+                if (szSQL[strlen(szSQL) - 2] == ',')
+                {
+                    szSQL[strlen(szSQL) - 2] = ' ';
+                }
+
+                sprintf_safe(szCodeLine, MAX_MYSQL_LINE_SIZE, "%s) \"\n \t\t\t",
+                             szSQL);
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
                 sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "vecObjectList[i]->m_szUUID, ");
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
-                for (int k = 0; k < (int)pObjectClass->m_vec_Object_Info.size(); k++)
-                {
-                    if (k != (int)pObjectClass->m_vec_Object_Info.size() - 1)
-                    {
-                        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "obs%s, ",
-                                     pObjectClass->m_vec_Object_Info[k].m_strName.c_str());
-                        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-                    }
-                    else
-                    {
-                        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "obs%s, \n \t\t\t",
-                                     pObjectClass->m_vec_Object_Info[k].m_strName.c_str());
-                        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-                    }
-                }
+                szSQL[0] = '\0';
 
                 for (int k = 0; k < (int)pObjectClass->m_vec_Object_Info.size(); k++)
                 {
-                    if (k != (int)pObjectClass->m_vec_Object_Info.size() - 1)
+                    if (pObjectClass->m_vec_Object_Info[k].m_strAttribute != "")
                     {
-                        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "obs%s, ",
+                        sprintf_safe(szSQL, MAX_MYSQL_LINE_SIZE, "%sobs%s, ",
+                                     szSQL,
                                      pObjectClass->m_vec_Object_Info[k].m_strName.c_str());
-                        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
-                    }
-                    else
-                    {
-                        sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "obs%s)\n\n",
-                                     pObjectClass->m_vec_Object_Info[k].m_strName.c_str());
-                        fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
                     }
                 }
+
+                sprintf_safe(szCodeLine, MAX_MYSQL_LINE_SIZE, "%s\n \t\t\t",
+                             szSQL);
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
+
+                szSQL[0] = '\0';
+
+                for (int k = 0; k < (int)pObjectClass->m_vec_Object_Info.size(); k++)
+                {
+                    if (pObjectClass->m_vec_Object_Info[k].m_strAttribute != "")
+                    {
+                        sprintf_safe(szSQL, MAX_MYSQL_LINE_SIZE, "obs%s, ",
+                                     pObjectClass->m_vec_Object_Info[k].m_strName.c_str());
+                    }
+
+                }
+
+                sprintf_safe(szCodeLine, MAX_MYSQL_LINE_SIZE, "%s)\n\n",
+                             szSQL);
+                fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
                 sprintf_safe(szCodeLine, MAX_CODE_LINE_SIZE, "\t}\n");
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);

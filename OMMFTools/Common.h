@@ -41,7 +41,8 @@ using namespace std;
 #define OBJECT_TEST_PATH         "../Test"
 #define OBJECT_TEST_FILENAME     "TestManager"
 
-#define MAX_CODE_LINE_SIZE 500
+#define MAX_CODE_LINE_SIZE  500
+#define MAX_MYSQL_LINE_SIZE 2048
 
 struct _Function_Info
 {
