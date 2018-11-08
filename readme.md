@@ -1,6 +1,6 @@
 # OMMF(Object-Manager-Message-Function)
 [![Build Status](https://travis-ci.org/freeeyes/OMMF.svg?branch=master)](https://travis-ci.org/freeeyes/OMMF)  
-##OMMF目标
+## OMMF目标
 通过XML，设计逻辑流程，并自动生成对应的类代码，数据库存储代码，缓冲层读写代码。
 节省不必要的程序员编写类读写代码的时间。
 并且通过配置文件，实现梳理业务流程的目的。
@@ -13,5 +13,6 @@
 - [x] 3.开发支持Mysql数据库脚本自动化生成的代码。
 - [x] 4.开发支持将mysql数据读函数和ObjectManager管理类互通的接口。
 - [ ] 6.添加OMMF开发文档，使用文档。
+- [ ] 7.添加支持单元数据变化的类回调接口。
 
 ![设计导图](image.jpg)
