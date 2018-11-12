@@ -295,7 +295,7 @@ bool CMysqlObject::Create_Mysql_Code_Cpp(vec_Xml_Mysql_DB objMysqlDBList, vec_Ob
                     szSQL[strlen(szSQL) - 2] = ' ';
                 }
 
-                sprintf_safe(szCodeLine, MAX_MYSQL_LINE_SIZE, "%s)\\\n \t\t\t(",
+                sprintf_safe(szCodeLine, MAX_MYSQL_LINE_SIZE, "%s) values\\\n \t\t\t(",
                              szSQL);
                 fwrite(szCodeLine, strlen(szCodeLine), sizeof(char), pFile);
 
