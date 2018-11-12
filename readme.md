@@ -1,5 +1,5 @@
 # OMMF(Object-Manager-Message-Function)
-[![Build Status](https://travis-ci.org/freeeyes/OMMF.svg?branch=master)](https://travis-ci.org/freeeyes/OMMF)  
+[![Build Status](https://travis-ci.org/ArkGame/OMMF.svg?branch=master)](https://travis-ci.org/ArkGame/OMMF)  
 ## OMMF目标
 通过XML，设计逻辑流程，并自动生成对应的类代码，数据库存储代码，缓冲层读写代码。
 节省不必要的程序员编写类读写代码的时间。
