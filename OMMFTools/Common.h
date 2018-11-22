@@ -154,7 +154,7 @@ static int copyFile(const char* src, const char* des)
         int nLen = 0;
         char szBuf[1024] = { 0 };
 
-        while ((nLen = fread(szBuf, 1, sizeof szBuf, pSrc)) > 0)
+        while ((nLen = (int)fread(szBuf, 1, sizeof szBuf, pSrc)) > 0)
         {
             fwrite(szBuf, 1, nLen, pDes);
         }
@@ -183,7 +183,7 @@ static void mkdirs(char* muldir)
     int i, len;
     char str[512];
     strncpy(str, muldir, 512);
-    len = strlen(str);
+    len = (int)strlen(str);
 
     for (i = 0; i < len; i++)
     {
@@ -191,27 +191,42 @@ static void mkdirs(char* muldir)
         {
             str[i] = '\0';
 
+#ifdef WIN32
+
+            if (_access(str, 0) != 0)
+            {
+                _mkdir(str);
+            }
+
+#else
+
             if (access(str, 0) != 0)
             {
-#ifdef WIN32
-                mkdir(str);
-#else
                 mkdir(str, 0777);
-#endif
             }
+
+#endif
+
 
             str[i] = '/';
         }
     }
 
+#ifdef WIN32
+
+    if (len > 0 && _access(str, 0) != 0)
+    {
+        _mkdir(str);
+    }
+
+#else
+
     if (len > 0 && access(str, 0) != 0)
     {
-#ifdef WIN32
-        mkdir(str);
-#else
         mkdir(str, 0777);
-#endif
     }
+
+#endif
 
     return;
 }
@@ -221,26 +236,34 @@ static bool Create_Project_Path(const char* pPath)
 {
     int nflag = 0;
     //查看文件夹有没有写权限
+#ifdef WIN32
+    int nRet = _access(pPath, 02);
+
+    if (0 != nRet)
+    {
+        //需要创建文件夹
+        nflag = _mkdir(pPath);
+    }
+
+#else
     int nRet = access(pPath, 02);
 
     if (0 != nRet)
     {
         //需要创建文件夹
-#ifdef WIN32
-        nflag = mkdir(pPath);
-#else
         nflag = mkdir(pPath, 0777);
+    }
+
 #endif
 
-        if (nflag == 0)
-        {
-            return true;
-        }
-        else
-        {
-            printf("[Create_Project_Path]Create Path(%s) error.\n", pPath);
-            return false;
-        }
+    if (nflag == 0)
+    {
+        return true;
+    }
+    else
+    {
+        printf("[Create_Project_Path]Create Path(%s) error.\n", pPath);
+        return false;
     }
 
     return true;
